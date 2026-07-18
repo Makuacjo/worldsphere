@@ -136,22 +136,10 @@ const Footer = () => {
         <hr className="my-5" style={{ borderColor: 'var(--secondary-color)' }} />
 
         <Row className="align-items-center">
-          <Col md={6} className="text-center text-md-start">
+          <Col className="text-center text-md-start">
             <p className="mb-0 small" style={{ opacity: 0.6 }}>
               &copy; {currentYear} WorldSphere. All rights reserved.
             </p>
-          </Col>
-          <Col md={6} className="text-center text-md-end">
-             {/* GitHub link */}
-             <a 
-               href="https://github.com/kamunyuraphael" 
-               target="_blank" 
-               rel="noreferrer" 
-               className="text-decoration-none small" 
-               style={{ color: 'var(--highlight-color)' }}
-             >
-               Developed by Raphael Kamau
-             </a>
           </Col>
         </Row>
       </Container>
