@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { createBrowserRouter, RouterProvider, Outlet, Navigate } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
 import { MotionConfig } from 'framer-motion';
 import { Spinner } from 'react-bootstrap';
 import Navbar from './components/Navbar'
@@ -25,6 +25,8 @@ const Stories = lazy(() => import('./pages/Stories'));
 const AIExplorer = lazy(() => import('./pages/AIExplorer'));
 const Communities = lazy(() => import('./pages/Communities'));
 const Expeditions = lazy(() => import('./pages/Expeditions'));
+const GbifExplore = lazy(() => import('./pages/GbifExplore'));
+const GbifSpecies = lazy(() => import('./pages/GbifSpecies'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const RiskPredictor = lazy(() => import('./pages/RiskPredictor'));
 const Login = lazy(() => import('./pages/Login'));
@@ -61,8 +63,9 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Home /> },
 
-      // Explore == browse the living atlas (Stories is the catalog surface)
-      { path: 'explore', element: <Navigate to="/stories" replace /> },
+      // Explore == real biodiversity search over GBIF
+      { path: 'explore', element: <GbifExplore /> },
+      { path: 'explore/:key', element: <GbifSpecies /> },
       { path: 'stories', element: <Stories /> },
       { path: 'maps', element: <Maps /> },
       { path: 'research', element: <Dashboard /> },
