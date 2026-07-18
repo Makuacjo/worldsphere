@@ -93,16 +93,12 @@ const Dashboard = () => {
             <Container>
                 <div className="page-head d-flex flex-wrap justify-content-between align-items-end gap-3">
                     <div>
-                        <p className="kicker">Data Overview</p>
-                        <h1 className="page-head__title">Dashboard</h1>
-                        <p className="page-head__lede mb-0">A quick look at what's in WorldSphere, and what the conservation model has learned.</p>
+                        <p className="kicker">Research</p>
+                        <h1 className="page-head__title">What the data is learning</h1>
+                        <p className="page-head__lede mb-0">A living research feed — the WorldSphere catalog and the patterns the conservation model has surfaced.</p>
                     </div>
-                    <Link
-                        to="/risk-predictor"
-                        className="text-decoration-none fw-bold px-4 py-2"
-                        style={{ backgroundColor: 'var(--highlight-color)', color: 'var(--foundation-color)', borderRadius: '4px' }}
-                    >
-                        Try the Risk Predictor &rarr;
+                    <Link to="/ai" className="btn btn-solar">
+                        Open AI Explorer &rarr;
                     </Link>
                 </div>
 

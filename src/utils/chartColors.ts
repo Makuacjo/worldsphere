@@ -9,5 +9,6 @@ export const CATEGORY_COLORS: Record<string, string> = {
 };
 
 // General-purpose qualitative palette for charts with categories that
-// aren't risk levels (taxonomic class, population trend, etc.)
-export const QUALITATIVE_COLORS = ['#A68D4A', '#4E6A5B', '#C97A7A', '#7C9C89', '#DEDCCF', '#283B28'];
+// aren't risk levels (taxonomic class, population trend, etc.).
+// WorldSphere cool editorial tones.
+export const QUALITATIVE_COLORS = ['#6B8487', '#8FB2A9', '#B6C1D3', '#4A6B3A', '#D6D8DE', '#394C59'];

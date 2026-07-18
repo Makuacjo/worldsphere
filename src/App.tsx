@@ -23,6 +23,8 @@ const Search = lazy(() => import('./pages/Search'));
 const Maps = lazy(() => import('./pages/Maps'));
 const Stories = lazy(() => import('./pages/Stories'));
 const AIExplorer = lazy(() => import('./pages/AIExplorer'));
+const Communities = lazy(() => import('./pages/Communities'));
+const Expeditions = lazy(() => import('./pages/Expeditions'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const RiskPredictor = lazy(() => import('./pages/RiskPredictor'));
 const Login = lazy(() => import('./pages/Login'));
@@ -64,16 +66,9 @@ const router = createBrowserRouter([
       },
       { path: 'stories', element: <Stories /> },
       { path: 'maps', element: <Maps /> },
-      {
-        path: 'research',
-        element: <ComingSoon title="Research" note="Arriving with live model insights"
-          blurb="A research feed powered by the conservation model — patterns, risk drivers, and what the data is learning." />,
-      },
-      {
-        path: 'communities',
-        element: <ComingSoon title="Communities" note="Design preview"
-          blurb="Where explorers, researchers, and conservationists gather around the species and places they care about." />,
-      },
+      { path: 'research', element: <Dashboard /> },
+      { path: 'communities', element: <Communities /> },
+      { path: 'expeditions', element: <Expeditions /> },
       { path: 'ai', element: <AIExplorer /> },
 
       // Category pages (kept; reframed as Stories in a later phase)
