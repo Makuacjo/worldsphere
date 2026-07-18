@@ -61,7 +61,7 @@ const Home = () => {
           placeholder={<div className="globe__fallback" aria-hidden="true" />}
         >
           <Suspense fallback={<div className="globe__fallback" aria-hidden="true" />}>
-            <InteractiveGlobe />
+            <InteractiveGlobe interactive={false} />
           </Suspense>
         </LazyInView>
         <div className="home-globe__copy">

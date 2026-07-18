@@ -174,7 +174,13 @@ void main(){
 
 interface Tooltip { name: string; x: number; y: number; visible: boolean; }
 
-const InteractiveGlobe = () => {
+interface Props {
+  /** Wheel-zoom + drag-rotate. Off for the embedded home teaser so page scroll
+   *  isn't trapped when the pointer is over the canvas. */
+  interactive?: boolean;
+}
+
+const InteractiveGlobe = ({ interactive = true }: Props) => {
   const mountRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const [tooltip, setTooltip] = useState<Tooltip>({ name: '', x: 0, y: 0, visible: false });
@@ -281,6 +287,11 @@ const InteractiveGlobe = () => {
     controls.autoRotate = !reduceMotion;
     controls.autoRotateSpeed = 0.5;
     controls.rotateSpeed = 0.55;
+    // Display-only globe (home teaser): don't capture wheel/drag so the page
+    // keeps scrolling normally over it.
+    controls.enableZoom = interactive;
+    controls.enableRotate = interactive;
+    if (!interactive) renderer.domElement.style.touchAction = 'pan-y';
 
     // Raycasting for markers
     const raycaster = new THREE.Raycaster();
@@ -363,7 +374,7 @@ const InteractiveGlobe = () => {
       starGeo.dispose();
       mount.removeChild(renderer.domElement);
     };
-  }, [navigate]);
+  }, [navigate, interactive]);
 
   return (
     <div className="globe">
