@@ -6,6 +6,7 @@ import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
+import ComingSoon from './pages/ComingSoon';
 
 import './index.css'
 
@@ -52,7 +53,39 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Home /> },
 
-      // Main Category Pages
+      // New IA surfaces (real pages land in later phases; on-brand shells for now)
+      {
+        path: 'explore',
+        element: <ComingSoon title="Explore" note="Arriving with the interactive globe"
+          blurb="An immersive way to roam the planet — the interactive Earth, continents, and the living things that define each region." />,
+      },
+      {
+        path: 'stories',
+        element: <ComingSoon title="Stories" note="Arriving in the editorial phase"
+          blurb="Field notes told like a magazine: the animals, plants, and waters of WorldSphere as full-bleed editorial stories." />,
+      },
+      {
+        path: 'maps',
+        element: <ComingSoon title="Maps" note="Arriving with the interactive globe"
+          blurb="A three-dimensional Earth you can spin, zoom, and explore — click a region to surface the species that live there." />,
+      },
+      {
+        path: 'research',
+        element: <ComingSoon title="Research" note="Arriving with live model insights"
+          blurb="A research feed powered by the conservation model — patterns, risk drivers, and what the data is learning." />,
+      },
+      {
+        path: 'communities',
+        element: <ComingSoon title="Communities" note="Design preview"
+          blurb="Where explorers, researchers, and conservationists gather around the species and places they care about." />,
+      },
+      {
+        path: 'ai',
+        element: <ComingSoon title="AI Explorer" note="Arriving wired to the ml-service"
+          blurb="Ask the planet. Predict conservation risk, surface endangered species, and explore regions through a conversational lens." />,
+      },
+
+      // Category pages (kept; reframed as Stories in a later phase)
       { path: 'animals', element: <Animals /> },
       { path: 'plants', element: <Plants /> },
       { path: 'waters', element: <Waters /> },
