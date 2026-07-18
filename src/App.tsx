@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Outlet, Navigate } from 'react-router-dom';
 import { MotionConfig } from 'framer-motion';
 import { Spinner } from 'react-bootstrap';
 import Navbar from './components/Navbar'
@@ -8,7 +8,6 @@ import ConstellationCursor from './components/ConstellationCursor';
 import SmoothScroll from './components/SmoothScroll';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
-import ComingSoon from './pages/ComingSoon';
 
 import './index.css'
 
@@ -63,12 +62,8 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Home /> },
 
-      // New IA surfaces (real pages land in later phases; on-brand shells for now)
-      {
-        path: 'explore',
-        element: <ComingSoon title="Explore" note="Arriving with the interactive globe"
-          blurb="An immersive way to roam the planet — the interactive Earth, continents, and the living things that define each region." />,
-      },
+      // Explore == browse the living atlas (Stories is the catalog surface)
+      { path: 'explore', element: <Navigate to="/stories" replace /> },
       { path: 'stories', element: <Stories /> },
       { path: 'maps', element: <Maps /> },
       { path: 'research', element: <Dashboard /> },
