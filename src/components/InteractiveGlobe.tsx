@@ -323,13 +323,13 @@ const InteractiveGlobe = () => {
     };
     window.addEventListener('resize', resize);
 
-    const clock = new THREE.Clock();
+    const start = performance.now();
     let raf = 0;
     let running = true;
 
     const render = () => {
       if (!running) return;
-      const t = clock.getElapsedTime();
+      const t = (performance.now() - start) / 1000;
       earthMat.uniforms.uTime.value = t;
       stars.rotation.y = t * 0.01;
       // Pulse hovered marker
