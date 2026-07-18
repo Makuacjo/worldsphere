@@ -20,6 +20,7 @@ const Waters = lazy(() => import('./pages/Waters'));
 const About = lazy(() => import('./pages/About'));
 const SpeciesDetail = lazy(() => import('./pages/SpeciesDetails'));
 const Search = lazy(() => import('./pages/Search'));
+const Maps = lazy(() => import('./pages/Maps'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const RiskPredictor = lazy(() => import('./pages/RiskPredictor'));
 const Login = lazy(() => import('./pages/Login'));
@@ -64,11 +65,7 @@ const router = createBrowserRouter([
         element: <ComingSoon title="Stories" note="Arriving in the editorial phase"
           blurb="Field notes told like a magazine: the animals, plants, and waters of WorldSphere as full-bleed editorial stories." />,
       },
-      {
-        path: 'maps',
-        element: <ComingSoon title="Maps" note="Arriving with the interactive globe"
-          blurb="A three-dimensional Earth you can spin, zoom, and explore — click a region to surface the species that live there." />,
-      },
+      { path: 'maps', element: <Maps /> },
       {
         path: 'research',
         element: <ComingSoon title="Research" note="Arriving with live model insights"

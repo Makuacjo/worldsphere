@@ -900,6 +900,62 @@ a:hover { color: var(--highlight-color); }
   }
 }
 
+/* ------------------------------------------------------------- Globe ----- */
+.maps {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  background: radial-gradient(120% 90% at 50% 120%, color-mix(in oklab, var(--ocean) 45%, var(--bg)), var(--bg) 70%);
+}
+.maps__overlay {
+  position: absolute;
+  inset: 0 0 auto 0;
+  z-index: var(--z-raised);
+  padding: calc(var(--space-xl) + 3rem) 1.5rem 0;
+  text-align: center;
+  pointer-events: none;
+}
+.maps__title {
+  font-size: var(--step-5);
+  color: var(--ink-strong);
+  margin: 0.5rem 0;
+}
+.maps__lede {
+  color: var(--ink-dim);
+  max-width: 48ch;
+  margin: 0 auto;
+  font-size: var(--step-0);
+}
+.globe { position: absolute; inset: 0; }
+.globe__stage { position: absolute; inset: 0; }
+.globe__stage canvas { display: block; touch-action: none; }
+.globe__fallback {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 45%, var(--teal), var(--ocean) 45%, var(--bg) 80%);
+}
+.globe__tip {
+  position: fixed;
+  transform: translate(-50%, -145%);
+  z-index: var(--z-tooltip);
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 0.45rem 0.8rem;
+  border-radius: 10px;
+  background: color-mix(in oklab, var(--bg-elev) 85%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+  color: var(--ink-strong);
+  font-weight: 600;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+.globe__tip small { color: var(--accent-bright); font-weight: 500; font-size: 0.68rem; }
+
 /* ------------------------------------------------- Coming-soon shell ----- */
 .coming {
   max-width: 46rem;
