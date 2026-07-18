@@ -8,9 +8,12 @@ from __future__ import annotations
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
+from pydantic import BaseModel
 
 from app.schemas import PredictionRequest, PredictionResponse, InsightsResponse
 from app.service import Model
+from app import ai
 
 app = FastAPI(title="WorldSphere Conservation Insights API", version="1.0.0")
 
@@ -33,7 +36,24 @@ _NOT_TRAINED = "Model not trained yet. Run: python model/train.py"
 
 @app.get("/health")
 def health() -> dict:
-    return {"status": "ok", "model_ready": model.ready}
+    return {"status": "ok", "model_ready": model.ready, "ai_ready": ai.available()}
+
+
+class AskRequest(BaseModel):
+    question: str
+
+
+@app.post("/ai/ask")
+def ai_ask(req: AskRequest) -> StreamingResponse:
+    if not ai.available():
+        raise HTTPException(
+            status_code=503,
+            detail="AI is not configured. Set ANTHROPIC_API_KEY in the ml-service environment.",
+        )
+    question = req.question.strip()
+    if not question:
+        raise HTTPException(status_code=400, detail="Ask a question first.")
+    return StreamingResponse(ai.stream_answer(question), media_type="text/plain; charset=utf-8")
 
 
 @app.post("/predict", response_model=PredictionResponse)

@@ -1327,6 +1327,30 @@ a:hover { color: var(--highlight-color); }
 .ai-ask input::placeholder { color: var(--ink-dim); }
 .ai-ask__btn { flex: none; padding: 0.7rem 1.3rem; }
 .ai-note { margin-top: 0.75rem; color: var(--ink-dim); font-size: var(--step--1); }
+.ai-answer {
+  margin-top: var(--space-md);
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  max-width: 60rem;
+}
+.ai-answer__body { color: var(--ink); }
+.ai-answer__body h1, .ai-answer__body h2, .ai-answer__body h3, .ai-answer__body strong { color: var(--ink-strong); }
+.ai-answer__body a { color: var(--accent-bright); }
+.ai-answer__body :first-child { margin-top: 0; }
+.ai-answer__body :last-child { margin-bottom: 0; }
+.ai-answer__error { color: var(--error-color); margin: 0; }
+.ai-caret {
+  display: inline-block;
+  width: 8px;
+  height: 1.1em;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  background: var(--accent-bright);
+  animation: blink 1s steps(2) infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
 .ai-topics {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));

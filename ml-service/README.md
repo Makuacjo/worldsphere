@@ -10,9 +10,26 @@ The API contract matches the frontend in `../src/services/conservationApi.ts`.
 
 | Method | Path        | Returns                                            |
 |--------|-------------|----------------------------------------------------|
-| GET    | `/health`   | `{ status, model_ready }`                          |
+| GET    | `/health`   | `{ status, model_ready, ai_ready }`                |
 | POST   | `/predict`  | `PredictionResponse` (category + probabilities)    |
 | GET    | `/insights` | `InsightsResponse` (distributions, importances, …) |
+| POST   | `/ai/ask`   | Streamed plain-text answer from Claude (AI Explorer) |
+
+## AI Explorer (Claude)
+
+The `/ai/ask` endpoint streams natural-language answers from Claude. The API key
+stays server-side — the browser never sees it. Set it before starting uvicorn:
+
+```bash
+# Windows (PowerShell):
+$env:ANTHROPIC_API_KEY = "sk-ant-..."
+# macOS / Linux:
+# export ANTHROPIC_API_KEY="sk-ant-..."
+```
+
+Optional: `AI_MODEL` overrides the model (default `claude-opus-4-8`). Without a
+key, `/ai/ask` returns a 503 and the AI Explorer shows a "not configured" state —
+everything else keeps working.
 
 ## Run it
 

@@ -1,15 +1,18 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useRef, useState, type FormEvent } from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import ReactMarkdown from 'react-markdown';
 import {
-  Sparkles, ArrowRight, ShieldAlert, Leaf, Globe2, LineChart, Compass, FlaskConical,
+  Sparkles, ArrowRight, ShieldAlert, Leaf, Globe2, LineChart, Compass, FlaskConical, Loader2,
 } from 'lucide-react';
 import RiskPredictorPanel from '../components/RiskPredictorPanel';
+import { askStream, AiError } from '../services/ai';
 
-const PLACEHOLDERS = [
-  'Search the atlas — “bengal tiger”, “coral reef”, “ancient trees”…',
-  'Find a species by name, habitat, or region…',
-  'Try “elephant”, “freshwater”, or “endangered”…',
+const SUGGESTED_QUESTIONS = [
+  'Why are amphibians declining worldwide?',
+  'What makes a keystone species?',
+  'How does coral bleaching happen?',
+  'Which animals are ecosystem engineers?',
 ];
 
 type Topic =
@@ -21,7 +24,7 @@ const TOPICS: Topic[] = [
   { icon: Leaf, title: 'Find endangered species', blurb: 'Browse the wildlife most at risk across the catalog.', to: '/stories?category=animal' },
   { icon: Globe2, title: 'Explore a region', blurb: 'Spin the globe and surface life by continent.', to: '/maps' },
   { icon: LineChart, title: 'Population & climate trends', blurb: 'See what the conservation model has learned.', to: '/research' },
-  { icon: Compass, title: 'Roam the atlas', blurb: 'Start an open-ended expedition through Earth.', to: '/explore' },
+  { icon: Compass, title: 'Roam the atlas', blurb: 'Search hundreds of millions of real records.', to: '/explore' },
   { icon: FlaskConical, title: 'Research assistant', blurb: 'Dive into the data behind every prediction.', to: '/research' },
 ];
 
@@ -32,24 +35,39 @@ const item = {
 };
 
 const AIExplorer = () => {
-  const navigate = useNavigate();
   const [query, setQuery] = useState('');
-  const [ph, setPh] = useState(0);
+  const [answer, setAnswer] = useState('');
+  const [streaming, setStreaming] = useState(false);
+  const [error, setError] = useState('');
   const predictorRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const id = setInterval(() => setPh(p => (p + 1) % PLACEHOLDERS.length), 3600);
-    return () => clearInterval(id);
-  }, []);
+  const ask = async (q: string) => {
+    const question = q.trim();
+    if (!question || streaming) return;
+    setQuery(question);
+    setAnswer('');
+    setError('');
+    setStreaming(true);
+    try {
+      for await (const chunk of askStream(question)) {
+        setAnswer(prev => prev + chunk);
+      }
+    } catch (err) {
+      setError(err instanceof AiError ? err.message : 'Something went wrong asking the AI.');
+    } finally {
+      setStreaming(false);
+    }
+  };
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
-    const q = query.trim();
-    if (q) navigate(`/search?q=${encodeURIComponent(q)}`);
+    ask(query);
   };
 
   const scrollToPredictor = () =>
     predictorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  const showPanel = streaming || answer || error;
 
   return (
     <section className="page-shell">
@@ -58,8 +76,9 @@ const AIExplorer = () => {
           <p className="kicker">AI Explorer</p>
           <h1 className="ai-title">Ask the planet</h1>
           <p className="ai-lede measure">
-            Explore Earth through a conversational lens — search the living atlas,
-            then dive into the conservation model to predict a species' future.
+            A conversation with a field naturalist, powered by Claude. Ask about
+            any species, habitat, or conservation question — then dive into the
+            model to predict a species' future.
           </p>
 
           <form className="ai-ask" onSubmit={onSubmit} role="search">
@@ -67,17 +86,34 @@ const AIExplorer = () => {
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder={PLACEHOLDERS[ph]}
-              aria-label="Ask or search the atlas"
+              placeholder="Ask the planet anything — “Why do sea otters matter?”"
+              aria-label="Ask the AI naturalist"
             />
-            <button type="submit" className="btn-solar ai-ask__btn">
-              Explore <ArrowRight size={16} strokeWidth={2} />
+            <button type="submit" className="btn-solar ai-ask__btn" disabled={streaming}>
+              {streaming ? <Loader2 size={16} className="spin" /> : <>Ask <ArrowRight size={16} strokeWidth={2} /></>}
             </button>
           </form>
-          <p className="ai-note">
-            Atlas search is live. Region, risk, and research flows connect to the
-            conservation ml-service.
-          </p>
+
+          <div className="stories__filters" style={{ marginTop: '1rem' }}>
+            {SUGGESTED_QUESTIONS.map(q => (
+              <button key={q} type="button" className="chip chip--sm" onClick={() => ask(q)} disabled={streaming}>
+                {q}
+              </button>
+            ))}
+          </div>
+
+          {showPanel && (
+            <div className="ai-answer">
+              {error ? (
+                <p className="ai-answer__error">{error}</p>
+              ) : (
+                <div className="ai-answer__body markdown-content">
+                  <ReactMarkdown>{answer}</ReactMarkdown>
+                  {streaming && <span className="ai-caret" aria-hidden="true" />}
+                </div>
+              )}
+            </div>
+          )}
         </header>
 
         <motion.div
