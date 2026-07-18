@@ -900,6 +900,121 @@ a:hover { color: var(--highlight-color); }
   }
 }
 
+/* ------------------------------------------------------ Story cards ------ */
+.story {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  aspect-ratio: 3 / 4;
+  color: #fff;
+  text-decoration: none;
+  box-shadow: var(--shadow-md);
+  isolation: isolate;
+}
+.story--featured { aspect-ratio: 16 / 10; }
+.story__media { position: absolute; inset: 0; z-index: -1; }
+.story__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 1.2s var(--ease-out-quart);
+}
+.story:hover .story__media img { transform: scale(1.08); } /* Ken Burns */
+.story__scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(8, 12, 15, 0.94) 2%, rgba(8, 12, 15, 0.4) 45%, rgba(8, 12, 15, 0.04) 100%);
+}
+.story__body {
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.story__eyebrow { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 0.2rem; }
+.story__tag {
+  background: var(--accent-bright);
+  color: #0C1114;
+  font-weight: 600;
+  font-size: 0.66rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+}
+.story__meta { display: inline-flex; align-items: center; gap: 0.3rem; color: var(--cloud); font-size: 0.74rem; }
+.story__title {
+  font-size: var(--step-2);
+  margin: 0;
+  color: #fff;
+  text-wrap: balance;
+}
+.story--featured .story__title { font-size: var(--step-4); max-width: 18ch; }
+.story__excerpt {
+  color: rgba(230, 232, 238, 0.85);
+  font-size: 0.9rem;
+  margin: 0;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transform: translateY(6px);
+  transition: max-height var(--dur-mid) var(--ease-out-quart), opacity var(--dur-mid), transform var(--dur-mid) var(--ease-out-quart);
+}
+.story:hover .story__excerpt { max-height: 7rem; opacity: 1; transform: none; }
+.story__more {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--accent-bright);
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity var(--dur-mid), transform var(--dur-mid) var(--ease-out-quart);
+}
+.story:hover .story__more { opacity: 1; transform: none; }
+.story__more svg { transition: transform var(--dur-fast) var(--ease-out-quart); }
+.story:hover .story__more svg { transform: translateX(4px); }
+
+/* Reveal excerpt/more without hover on touch devices (no hover state) */
+@media (hover: none) {
+  .story__excerpt { max-height: 7rem; opacity: 1; transform: none; }
+  .story__more { opacity: 1; transform: none; }
+}
+
+/* --------------------------------------------------------- Stories page -- */
+.stories__head { margin-bottom: var(--space-lg); }
+.stories__title { font-size: var(--step-5); color: var(--ink-strong); margin: 0.4rem 0 0.75rem; }
+.stories__lede { color: var(--ink-dim); font-size: var(--step-1); }
+.stories__filters { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: var(--space-md); }
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--glass);
+  color: var(--ink-dim);
+  font-weight: 500;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: color var(--dur-fast) var(--ease-out-quart), background var(--dur-fast) var(--ease-out-quart), border-color var(--dur-fast) var(--ease-out-quart);
+}
+.chip:hover { color: var(--ink-strong); border-color: color-mix(in oklab, var(--accent-bright) 50%, var(--border)); }
+.chip.is-active { background: var(--accent-bright); color: #0C1114; border-color: transparent; }
+.chip--region { background: color-mix(in oklab, var(--accent-bright) 18%, transparent); color: var(--ink-strong); border-color: color-mix(in oklab, var(--accent-bright) 40%, var(--border)); }
+.stories__featured { margin-bottom: var(--space-md); }
+.stories__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(258px, 1fr));
+  gap: var(--space-sm);
+}
+
 /* ------------------------------------------------------------- Globe ----- */
 .maps {
   position: relative;
