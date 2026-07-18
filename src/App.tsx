@@ -22,6 +22,7 @@ const SpeciesDetail = lazy(() => import('./pages/SpeciesDetails'));
 const Search = lazy(() => import('./pages/Search'));
 const Maps = lazy(() => import('./pages/Maps'));
 const Stories = lazy(() => import('./pages/Stories'));
+const AIExplorer = lazy(() => import('./pages/AIExplorer'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const RiskPredictor = lazy(() => import('./pages/RiskPredictor'));
 const Login = lazy(() => import('./pages/Login'));
@@ -73,11 +74,7 @@ const router = createBrowserRouter([
         element: <ComingSoon title="Communities" note="Design preview"
           blurb="Where explorers, researchers, and conservationists gather around the species and places they care about." />,
       },
-      {
-        path: 'ai',
-        element: <ComingSoon title="AI Explorer" note="Arriving wired to the ml-service"
-          blurb="Ask the planet. Predict conservation risk, surface endangered species, and explore regions through a conversational lens." />,
-      },
+      { path: 'ai', element: <AIExplorer /> },
 
       // Category pages (kept; reframed as Stories in a later phase)
       { path: 'animals', element: <Animals /> },
