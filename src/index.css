@@ -329,9 +329,9 @@ a:hover { color: var(--highlight-color); }
   z-index: var(--z-base);
   background: linear-gradient(
     to bottom,
-    rgba(20, 22, 14, 0.15) 0%,
-    rgba(20, 22, 14, 0.35) 55%,
-    rgba(20, 22, 14, 0.62) 100%
+    rgba(10, 15, 18, 0.2) 0%,
+    rgba(10, 15, 18, 0.4) 55%,
+    rgba(10, 15, 18, 0.68) 100%
   );
   pointer-events: none;
 }
@@ -351,10 +351,13 @@ a:hover { color: var(--highlight-color); }
   font-style: italic;
   color: var(--highlight-color);
 }
+.hero__kicker {
+  color: var(--accent-bright);
+}
 .hero__lede {
   font-size: var(--step-1);
-  max-width: 44ch;
-  color: rgba(224, 222, 209, 0.9);
+  max-width: 46ch;
+  color: rgba(214, 216, 222, 0.88);
   margin: 0 0 var(--space-md);
   line-height: 1.55;
 }
@@ -408,13 +411,18 @@ a:hover { color: var(--highlight-color); }
 .btn-solar:hover {
   transform: translateY(-2px);
   filter: brightness(1.06);
-  box-shadow: 0 10px 26px rgba(166, 141, 74, 0.4);
-  color: var(--foundation-color);
+  box-shadow: 0 10px 30px rgba(143, 178, 169, 0.35);
+  color: #0C1114;
 }
 .btn-ghost {
-  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--glass);
   color: var(--on-dark-surface);
-  border: 1px solid rgba(224, 222, 209, 0.35);
+  border: 1px solid var(--border);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
   font-weight: 500;
   padding: 0.85rem 1.6rem;
   border-radius: 999px;
@@ -422,8 +430,8 @@ a:hover { color: var(--highlight-color); }
               background var(--dur-fast) var(--ease-out-quart);
 }
 .btn-ghost:hover {
-  border-color: var(--highlight-color);
-  background: rgba(166, 141, 74, 0.12);
+  border-color: var(--accent-bright);
+  background: var(--glass-strong);
   color: #fff;
 }
 

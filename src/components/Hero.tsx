@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react';
 import { Container } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { Compass, Play } from 'lucide-react';
 
 // The WebGL field (ogl) loads after the hero paints; the CSS gradient in
 // ShaderBackground's own fallback markup covers the gap, so first paint is instant.
@@ -9,25 +10,18 @@ const ShaderBackground = lazy(() => import('./ShaderBackground'));
 
 const container = {
   hidden: {},
-  show: {
-    transition: { staggerChildren: 0.1, delayChildren: 0.15 },
-  },
+  show: { transition: { staggerChildren: 0.1, delayChildren: 0.15 } },
 };
 
 const item = {
-  hidden: { opacity: 0, y: 24 },
+  hidden: { opacity: 0, y: 26, filter: 'blur(8px)' },
   show: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] },
+    filter: 'blur(0px)',
+    transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] },
   },
 };
-
-const categories = [
-  { label: 'Animals', to: '/animals' },
-  { label: 'Plants', to: '/plants' },
-  { label: 'Waters', to: '/waters' },
-];
 
 const Hero = () => {
   return (
@@ -37,30 +31,25 @@ const Hero = () => {
       </Suspense>
 
       <Container>
-        <motion.div
-          className="hero__inner"
-          variants={container}
-          initial="hidden"
-          animate="show"
-        >
-          <motion.p className="kicker mb-3" variants={item} style={{ color: 'var(--highlight-color)' }}>
-            A living atlas of Earth
-          </motion.p>
+        <motion.div className="hero__inner" variants={container} initial="hidden" animate="show">
+          <motion.p className="kicker hero__kicker mb-3" variants={item}>WORLDSPHERE</motion.p>
 
           <motion.h1 className="hero__title" variants={item}>
-            The wild, <em>documented</em> with care.
+            Explore the <em>Planet.</em>
           </motion.h1>
 
           <motion.p className="hero__lede" variants={item}>
-            Explore the animals, plants, and waters that hold our ecosystems together —
-            field notes, conservation status, and living data, all in one place.
+            Discover knowledge. Connect humanity. A living atlas of Earth's
+            animals, plants, and waters — told with the care of a field expedition.
           </motion.p>
 
           <motion.div className="hero__actions" variants={item}>
-            <Link to="/animals" className="btn btn-solar">Start exploring</Link>
-            {categories.map(c => (
-              <Link key={c.to} to={c.to} className="btn btn-ghost">{c.label}</Link>
-            ))}
+            <Link to="/explore" className="btn btn-solar">
+              <Compass size={18} strokeWidth={2} /> Begin Exploring
+            </Link>
+            <Link to="/stories" className="btn btn-ghost">
+              <Play size={16} strokeWidth={2} /> Watch Stories
+            </Link>
           </motion.div>
         </motion.div>
       </Container>
