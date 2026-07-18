@@ -1,0 +1,846 @@
+/* ============================================================================
+   WildSphere design system
+   Earthy identity preserved (forest / sage / gold). Fonts, fluid type scale,
+   spacing rhythm, motion tokens, and a semantic z-index scale layered on top.
+   All original color-var names are kept intact — components depend on them.
+   ========================================================================== */
+
+:root {
+  /* ---- Brand color theme (unchanged names, used across all components) ---- */
+  --primary-color: #E0DED1;
+  --secondary-color: #4E6A5B;
+  --text-color: #282B1B;
+  --foundation-color: #283B28;
+  --highlight-color: #A68D4A;
+
+  /* Surface colors (page/section backgrounds) */
+  --surface-color: #F4F2E9;
+  --surface-alt-color: #DEDCCF;
+
+  /* Feedback colors */
+  --error-color: #C97A7A;
+
+  /* Constant ink — intentionally does NOT flip in dark mode (navbar/footer,
+     gold buttons stay legible even as other variables invert). */
+  --on-dark-surface: #E0DED1;
+
+  /* ---- Type ---- */
+  --font-display: 'Fraunces', ui-serif, Georgia, 'Times New Roman', serif;
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  /* Fluid type scale (minor-third-ish, viewport aware) */
+  --step--1: clamp(0.83rem, 0.79rem + 0.18vw, 0.94rem);
+  --step-0:  clamp(1rem, 0.95rem + 0.24vw, 1.13rem);
+  --step-1:  clamp(1.2rem, 1.12rem + 0.4vw, 1.5rem);
+  --step-2:  clamp(1.44rem, 1.3rem + 0.7vw, 2rem);
+  --step-3:  clamp(1.73rem, 1.5rem + 1.15vw, 2.66rem);
+  --step-4:  clamp(2.07rem, 1.7rem + 1.85vw, 3.55rem);
+  --step-5:  clamp(2.49rem, 1.9rem + 2.95vw, 4.73rem);
+  --step-6:  clamp(2.99rem, 2.900rem + 4.6vw, 5.9rem);
+
+  /* ---- Spacing rhythm ---- */
+  --space-2xs: 0.375rem;
+  --space-xs: 0.75rem;
+  --space-sm: 1.25rem;
+  --space-md: 2rem;
+  --space-lg: 3.25rem;
+  --space-xl: 5.25rem;
+  --space-2xl: 8.5rem;
+
+  /* ---- Motion ---- */
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-soft: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 180ms;
+  --dur-mid: 320ms;
+  --dur-slow: 620ms;
+
+  /* ---- Semantic z-index scale ---- */
+  --z-base: 0;
+  --z-raised: 10;
+  --z-sticky: 100;
+  --z-nav: 300;
+  --z-backdrop: 400;
+  --z-modal: 500;
+  --z-toast: 600;
+  --z-tooltip: 700;
+
+  /* Radii + elevation */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --shadow-sm: 0 2px 8px rgba(40, 37, 27, 0.06), 0 1px 2px rgba(40, 37, 27, 0.08);
+  --shadow-md: 0 12px 30px rgba(40, 37, 27, 0.1), 0 4px 8px rgba(40, 37, 27, 0.06);
+  --shadow-lg: 0 30px 60px rgba(20, 22, 14, 0.18), 0 10px 20px rgba(20, 22, 14, 0.1);
+}
+
+/* Dark theme overrides, toggled via data-theme="dark" on <html> (ThemeContext) */
+[data-theme="dark"] {
+  --primary-color: #23261B;
+  --secondary-color: #7C9C89;
+  --text-color: #E5E3D8;
+  --foundation-color: #14160E;
+  --highlight-color: #C9AD6C;
+  --surface-color: #181A11;
+  --surface-alt-color: #1F2216;
+  --error-color: #E08A8A;
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 12px 30px rgba(0, 0, 0, 0.45), 0 4px 8px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 30px 60px rgba(0, 0, 0, 0.6), 0 10px 20px rgba(0, 0, 0, 0.45);
+}
+
+/* ---------------------------------------------------------------- Base ---- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: var(--surface-color);
+  color: var(--text-color);
+  font-family: var(--font-sans);
+  font-size: var(--step-0);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  transition: background-color var(--dur-mid) var(--ease-in-out-soft),
+              color var(--dur-mid) var(--ease-in-out-soft);
+}
+
+h1, h2, h3, h4, h5, h6,
+.display-1, .display-2, .display-3, .display-4, .display-5, .display-6 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+/* Cap prose measure for readability (opt-in) */
+.measure {
+  max-width: 68ch;
+}
+
+::selection {
+  background: var(--highlight-color);
+  color: var(--foundation-color);
+}
+
+:focus-visible {
+  outline: 2px solid var(--highlight-color);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+a {
+  color: var(--secondary-color);
+  text-decoration-color: color-mix(in oklab, var(--secondary-color) 40%, transparent);
+  text-underline-offset: 3px;
+  transition: color var(--dur-fast) var(--ease-out-quart);
+}
+a:hover { color: var(--highlight-color); }
+
+/* ---------------------------------------------------- Legacy utilities ---- */
+
+.bg-forest {
+  background-color: var(--foundation-color) !important;
+  transition: background-color var(--dur-mid) var(--ease-in-out-soft);
+}
+
+.bg-transparent {
+  background-color: transparent !important;
+  transition: background-color var(--dur-mid) var(--ease-in-out-soft);
+}
+
+.navbar-nav .nav-link {
+  color: var(--primary-color);
+  font-weight: 500;
+}
+.navbar-nav .nav-link:hover {
+  color: var(--highlight-color);
+  transition: color var(--dur-fast) var(--ease-out-quart);
+}
+
+/* Hero carousel indicators (fixed selector: was ".carousel-inidicators") */
+.carousel-indicators [data-bs-target] {
+  background-color: var(--highlight-color) !important;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin: 0 6px;
+  opacity: 0.5;
+  transition: opacity var(--dur-fast) var(--ease-out-quart),
+              transform var(--dur-fast) var(--ease-out-quart);
+}
+.carousel-indicators .active[data-bs-target] {
+  opacity: 1;
+  transform: scale(1.25);
+}
+
+.hero-carousel { margin-top: 0; }
+
+.transition-hover {
+  transition: transform var(--dur-mid) var(--ease-out-quart),
+              box-shadow var(--dur-mid) var(--ease-out-quart);
+}
+.transition-hover:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-md) !important;
+}
+
+.card-img-hover {
+  transition: transform var(--dur-slow) var(--ease-out-quart);
+}
+.card-img-hover:hover { transform: scale(1.06); }
+
+/* --------------------------------------------------- Reveal-on-scroll ---- */
+/* Enhances an already-visible default: content is visible without JS/animation;
+   the .reveal class only animates the entrance when observed. */
+.reveal {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .reveal.reveal-init {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  .reveal.reveal-in {
+    opacity: 1;
+    transform: none;
+    transition: opacity var(--dur-slow) var(--ease-out-expo),
+                transform var(--dur-slow) var(--ease-out-expo);
+  }
+}
+
+/* Kicker / eyebrow label used across page headers */
+.kicker {
+  color: var(--highlight-color);
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+  font-weight: 600;
+  font-size: var(--step--1);
+  font-family: var(--font-sans);
+}
+
+/* ---------------------------------------------------- Markdown article ---- */
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3 {
+  color: var(--foundation-color);
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+.markdown-content p {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  margin-bottom: 1.5rem;
+}
+.markdown-content ul {
+  padding-left: 1.2rem;
+  list-style-type: square;
+  color: var(--secondary-color);
+}
+
+/* ------------------------------------------------------ Shader stage ---- */
+.shader-stage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: var(--z-base);
+}
+.shader-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+/* Visible until (and if) the WebGL canvas paints over it — also the final
+   fallback when WebGL is unavailable. On-brand forest gradient. */
+.shader-fallback {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(120% 120% at 20% 20%, color-mix(in oklab, var(--secondary-color) 55%, var(--foundation-color)) 0%, transparent 55%),
+    radial-gradient(120% 120% at 80% 80%, color-mix(in oklab, var(--highlight-color) 30%, var(--foundation-color)) 0%, transparent 50%),
+    var(--foundation-color);
+}
+
+/* ------------------------------------------------------------- Hero ------ */
+.hero {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  isolation: isolate;
+}
+/* Legibility scrim over the shader — darker at the bottom where text sits. */
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-base);
+  background: linear-gradient(
+    to bottom,
+    rgba(20, 22, 14, 0.15) 0%,
+    rgba(20, 22, 14, 0.35) 55%,
+    rgba(20, 22, 14, 0.62) 100%
+  );
+  pointer-events: none;
+}
+.hero__inner {
+  position: relative;
+  z-index: var(--z-raised);
+  color: var(--on-dark-surface);
+  max-width: 60rem;
+}
+.hero__title {
+  font-size: var(--step-6);
+  color: #fff;
+  margin: 0 0 var(--space-sm);
+  letter-spacing: -0.035em;
+}
+.hero__title em {
+  font-style: italic;
+  color: var(--highlight-color);
+}
+.hero__lede {
+  font-size: var(--step-1);
+  max-width: 44ch;
+  color: rgba(224, 222, 209, 0.9);
+  margin: 0 0 var(--space-md);
+  line-height: 1.55;
+}
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  align-items: center;
+}
+.hero__scroll {
+  position: absolute;
+  left: 50%;
+  bottom: 1.75rem;
+  transform: translateX(-50%);
+  z-index: var(--z-raised);
+  color: rgba(224, 222, 209, 0.7);
+  font-size: var(--step--1);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+.hero__scroll span {
+  width: 1px;
+  height: 42px;
+  background: linear-gradient(to bottom, transparent, var(--highlight-color));
+  animation: scrollpulse 2.4s var(--ease-in-out-soft) infinite;
+}
+@keyframes scrollpulse {
+  0%, 100% { transform: scaleY(0.4); opacity: 0.4; transform-origin: top; }
+  50%      { transform: scaleY(1);   opacity: 1;   transform-origin: top; }
+}
+
+/* Buttons used on the shader hero */
+.btn-solar {
+  background: var(--highlight-color);
+  color: var(--foundation-color);
+  border: none;
+  font-weight: 600;
+  padding: 0.85rem 1.9rem;
+  border-radius: 999px;
+  transition: transform var(--dur-fast) var(--ease-out-quart),
+              box-shadow var(--dur-fast) var(--ease-out-quart),
+              filter var(--dur-fast) var(--ease-out-quart);
+}
+.btn-solar:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+  box-shadow: 0 10px 26px rgba(166, 141, 74, 0.4);
+  color: var(--foundation-color);
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--on-dark-surface);
+  border: 1px solid rgba(224, 222, 209, 0.35);
+  font-weight: 500;
+  padding: 0.85rem 1.6rem;
+  border-radius: 999px;
+  transition: border-color var(--dur-fast) var(--ease-out-quart),
+              background var(--dur-fast) var(--ease-out-quart);
+}
+.btn-ghost:hover {
+  border-color: var(--highlight-color);
+  background: rgba(166, 141, 74, 0.12);
+  color: #fff;
+}
+
+/* --------------------------------------------------------- Navbar -------- */
+.site-nav {
+  padding-block: 1rem;
+  background: transparent;
+  transition: background var(--dur-mid) var(--ease-in-out-soft),
+              padding var(--dur-mid) var(--ease-in-out-soft),
+              box-shadow var(--dur-mid) var(--ease-in-out-soft);
+}
+.site-nav--solid {
+  padding-block: 0.5rem;
+  background: color-mix(in oklab, var(--foundation-color) 82%, transparent);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  backdrop-filter: blur(14px) saturate(1.2);
+  box-shadow: 0 1px 0 rgba(224, 222, 209, 0.08), var(--shadow-sm);
+}
+.site-nav__brand {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--on-dark-surface) !important;
+  font-size: 1.35rem;
+}
+.site-nav__brand span { color: var(--highlight-color); }
+.site-nav__toggle {
+  border: 0;
+  box-shadow: none;
+  filter: invert(1) brightness(1.4);
+}
+.site-nav__link {
+  color: rgba(224, 222, 209, 0.82) !important;
+  font-weight: 500;
+  padding-inline: 0.85rem !important;
+  position: relative;
+}
+.site-nav__link::after {
+  content: '';
+  position: absolute;
+  left: 0.85rem;
+  right: 0.85rem;
+  bottom: 0.3rem;
+  height: 2px;
+  background: var(--highlight-color);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--dur-fast) var(--ease-out-quart);
+}
+.site-nav__link:hover,
+.site-nav__link.is-active { color: #fff !important; }
+.site-nav__link.is-active::after { transform: scaleX(1); }
+.site-nav__link--accent { color: var(--highlight-color) !important; font-weight: 600; }
+
+/* --------------------------------------------------------- Sections ------ */
+.section {
+  padding-block: var(--space-xl);
+}
+.section__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-lg);
+}
+.section__title {
+  font-size: var(--step-4);
+  color: var(--text-color);
+  margin: 0;
+  max-width: 16ch;
+}
+.section__more {
+  font-weight: 600;
+  color: var(--secondary-color);
+  white-space: nowrap;
+  text-decoration: none;
+}
+.section__more span {
+  display: inline-block;
+  transition: transform var(--dur-fast) var(--ease-out-quart);
+}
+.section__more:hover span { transform: translateX(4px); }
+
+/* Insights editorial block */
+.insights__rule {
+  width: 56px;
+  height: 3px;
+  background: var(--highlight-color);
+  margin: 0 auto var(--space-sm);
+}
+.insights__title {
+  font-size: var(--step-4);
+  margin-bottom: var(--space-sm);
+}
+.insights__lede {
+  font-size: var(--step-1);
+  line-height: 1.7;
+  color: color-mix(in oklab, var(--text-color) 88%, transparent);
+}
+.insights__quote {
+  margin-top: var(--space-md);
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: var(--step-1);
+  color: var(--secondary-color);
+}
+.insights__quote span {
+  display: block;
+  margin-top: 0.5rem;
+  font-family: var(--font-sans);
+  font-style: normal;
+  font-size: var(--step--1);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+/* --------------------------------------------------------- Card ---------- */
+.wcard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--primary-color);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transform-style: preserve-3d;
+  transition: box-shadow var(--dur-mid) var(--ease-out-quart);
+  will-change: transform;
+}
+.wcard:hover { box-shadow: var(--shadow-lg); }
+.wcard__media {
+  display: block;
+  position: relative;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+}
+.wcard__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform var(--dur-slow) var(--ease-out-quart);
+}
+.wcard:hover .wcard__media img { transform: scale(1.06); }
+.wcard__badge {
+  position: absolute;
+  top: 0.85rem;
+  left: 0.85rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  font-size: var(--step--1);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--foundation-color);
+  background: color-mix(in oklab, var(--highlight-color) 92%, white);
+  box-shadow: var(--shadow-sm);
+  transform: translateZ(30px);
+}
+.wcard__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 1.5rem;
+  flex: 1;
+}
+.wcard__title {
+  font-size: var(--step-1);
+  color: var(--text-color);
+  margin: 0;
+}
+.wcard__subtitle {
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--secondary-color);
+  font-size: var(--step--1);
+  margin: 0;
+}
+.wcard__summary {
+  color: color-mix(in oklab, var(--text-color) 78%, transparent);
+  font-size: var(--step-0);
+  margin: 0.4rem 0 0;
+}
+.wcard__link {
+  margin-top: auto;
+  padding-top: 1rem;
+  font-weight: 600;
+  color: var(--highlight-color);
+  text-decoration: none;
+}
+.wcard__link span {
+  display: inline-block;
+  transition: transform var(--dur-fast) var(--ease-out-quart);
+}
+.wcard__link:hover span { transform: translateX(4px); }
+
+/* Page shell — clears the fixed navbar and sets the catalog/detail rhythm */
+.page-shell {
+  background: var(--surface-color);
+  min-height: 100vh;
+  padding: calc(var(--space-xl) + 3.5rem) 0 var(--space-xl);
+}
+.filter-bar {
+  margin-bottom: var(--space-lg);
+}
+.filter-bar .form-control,
+.filter-bar .form-select {
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--secondary-color) 35%, transparent);
+  background: var(--primary-color);
+  color: var(--text-color);
+  padding: 0.7rem 1.2rem;
+}
+.filter-bar .form-control:focus,
+.filter-bar .form-select:focus {
+  border-color: var(--highlight-color);
+  box-shadow: 0 0 0 3px rgba(166, 141, 74, 0.18);
+}
+.empty-note {
+  color: color-mix(in oklab, var(--text-color) 60%, transparent);
+  font-size: var(--step-1);
+  padding: var(--space-lg) 0;
+}
+
+/* Shared page-header block used across catalog pages */
+.page-head {
+  border-bottom: 1px solid color-mix(in oklab, var(--secondary-color) 35%, transparent);
+  padding-bottom: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+.page-head__title {
+  font-size: var(--step-5);
+  color: var(--text-color);
+  margin: 0.25rem 0 0.75rem;
+}
+.page-head__lede {
+  color: color-mix(in oklab, var(--text-color) 75%, transparent);
+  font-size: var(--step-1);
+  max-width: 60ch;
+  margin: 0;
+}
+
+/* ---------------------------------------------------- Species detail ----- */
+.species-hero {
+  position: relative;
+  min-height: 62vh;
+  display: flex;
+  align-items: flex-end;
+  padding: 0 0 var(--space-lg);
+  background-size: cover;
+  background-position: center;
+  color: #fff;
+  isolation: isolate;
+}
+.species-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(to top, rgba(20, 22, 14, 0.85) 0%, rgba(40, 43, 27, 0.35) 55%, rgba(40, 43, 27, 0.2) 100%);
+}
+.species-hero__badge {
+  display: inline-block;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  background: var(--highlight-color);
+  color: var(--foundation-color);
+  font-weight: 600;
+  font-size: var(--step--1);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.9rem;
+}
+.species-hero__title {
+  font-size: var(--step-6);
+  margin: 0;
+  color: #fff;
+}
+.species-hero__sub {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: var(--step-1);
+  opacity: 0.9;
+  margin: 0.35rem 0 0;
+}
+.species-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  justify-content: space-around;
+  background: var(--foundation-color);
+  color: var(--on-dark-surface);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  box-shadow: var(--shadow-md);
+}
+.species-facts small {
+  display: block;
+  color: var(--highlight-color);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: var(--step--1);
+  margin-bottom: 0.25rem;
+}
+.species-facts strong { font-size: var(--step-1); }
+.species-article {
+  background: var(--primary-color);
+  color: var(--text-color);
+  border-radius: var(--radius-md);
+  padding: clamp(1.75rem, 1rem + 3vw, 3.5rem);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ---------------------------------------------------------- About -------- */
+.about-pillar {
+  height: 100%;
+  background: var(--foundation-color);
+  color: var(--on-dark-surface);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  transition: transform var(--dur-mid) var(--ease-out-quart);
+}
+.about-pillar:hover { transform: translateY(-6px); }
+.about-pillar h4 {
+  color: var(--highlight-color);
+  margin-bottom: 0.75rem;
+}
+.about-frame {
+  border: 1px solid color-mix(in oklab, var(--secondary-color) 60%, transparent);
+  padding: 14px;
+  border-radius: var(--radius-md);
+}
+.about-frame img {
+  border-radius: calc(var(--radius-md) - 6px);
+  display: block;
+  width: 100%;
+}
+
+/* ------------------------------------------------------ Result count ----- */
+.result-count {
+  color: color-mix(in oklab, var(--text-color) 55%, transparent);
+  font-size: var(--step--1);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: var(--space-sm);
+}
+.result-count strong {
+  color: var(--highlight-color);
+  font-size: var(--step-0);
+}
+
+/* ------------------------------------------------- View transitions ------ */
+/* Card image ↔ species hero morph + a soft crossfade between routes. */
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0.42s;
+    animation-timing-function: var(--ease-out-expo);
+  }
+  ::view-transition-group(species-media) {
+    animation-duration: 0.5s;
+    animation-timing-function: var(--ease-out-expo);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* ------------------------------------------------- Panels & forms -------- */
+.panel {
+  background: var(--primary-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+.panel .form-control,
+.panel .form-select {
+  border-radius: var(--radius-sm);
+  border: 1px solid color-mix(in oklab, var(--secondary-color) 30%, transparent);
+  background: var(--surface-color);
+  color: var(--text-color);
+  padding: 0.6rem 0.9rem;
+}
+.panel .form-control::placeholder { color: color-mix(in oklab, var(--text-color) 45%, transparent); }
+.panel .form-control:focus,
+.panel .form-select:focus {
+  border-color: var(--highlight-color);
+  box-shadow: 0 0 0 3px rgba(166, 141, 74, 0.18);
+  background: var(--surface-color);
+  color: var(--text-color);
+}
+.panel .form-label { color: var(--text-color); font-weight: 500; }
+
+.auth-title {
+  font-size: var(--step-3);
+  color: var(--text-color);
+  margin-bottom: var(--space-md);
+}
+
+/* Stat + chart cards for the data/tool surfaces */
+.stat {
+  height: 100%;
+  text-align: center;
+  padding: var(--space-md);
+  background: var(--primary-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+.stat__value {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--step-4);
+  color: var(--highlight-color);
+  line-height: 1;
+  margin-bottom: 0.4rem;
+}
+.stat__label {
+  font-size: var(--step--1);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--secondary-color);
+  margin: 0;
+}
+.chart-card {
+  height: 100%;
+  padding: var(--space-md);
+  background: var(--primary-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+.chart-card__title {
+  font-size: var(--step-1);
+  color: var(--text-color);
+  margin-bottom: var(--space-sm);
+}
+
+/* ------------------------------------------------- Reduced motion base ---- */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
