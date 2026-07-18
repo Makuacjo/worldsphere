@@ -1491,6 +1491,30 @@ a:hover { color: var(--highlight-color); }
   margin-bottom: var(--space-sm);
 }
 
+/* ------------------------------------------------ Constellation cursor --- */
+.constellation {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+}
+
+/* Accessibility skip link */
+.skip-link {
+  position: fixed;
+  top: -100px;
+  left: 1rem;
+  z-index: var(--z-tooltip);
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  background: var(--accent-bright);
+  color: #0C1114;
+  font-weight: 600;
+  text-decoration: none;
+  transition: top var(--dur-fast) var(--ease-out-quart);
+}
+.skip-link:focus { top: 1rem; color: #0C1114; }
+
 /* ------------------------------------------------- Reduced motion base ---- */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }

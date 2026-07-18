@@ -4,6 +4,8 @@ import { MotionConfig } from 'framer-motion';
 import { Spinner } from 'react-bootstrap';
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
+import ConstellationCursor from './components/ConstellationCursor';
+import SmoothScroll from './components/SmoothScroll';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import ComingSoon from './pages/ComingSoon';
@@ -43,10 +45,13 @@ const PageFallback = () => (
 // Link viewTransition / useViewTransitionState only work under it.
 const Layout = () => (
   <>
+    <a href="#main-content" className="skip-link">Skip to content</a>
     <Navbar />
-    <Suspense fallback={<PageFallback />}>
-      <Outlet />
-    </Suspense>
+    <div id="main-content">
+      <Suspense fallback={<PageFallback />}>
+        <Outlet />
+      </Suspense>
+    </div>
     <Footer />
   </>
 );
@@ -100,6 +105,8 @@ function App() {
       <AuthProvider>
         {/* reducedMotion="user" makes every framer animation honor the OS setting */}
         <MotionConfig reducedMotion="user">
+          <SmoothScroll />
+          <ConstellationCursor />
           <RouterProvider router={router} />
         </MotionConfig>
       </AuthProvider>

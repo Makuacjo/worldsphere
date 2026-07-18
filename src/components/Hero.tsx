@@ -3,6 +3,7 @@ import { Container } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Compass, Play } from 'lucide-react';
+import { useMagnetic } from '../hooks/useMagnetic';
 
 // The WebGL field (ogl) loads after the hero paints; the CSS gradient in
 // ShaderBackground's own fallback markup covers the gap, so first paint is instant.
@@ -24,6 +25,9 @@ const item = {
 };
 
 const Hero = () => {
+  const magPrimary = useMagnetic<HTMLAnchorElement>();
+  const magGhost = useMagnetic<HTMLAnchorElement>(0.25);
+
   return (
     <section className="hero">
       <Suspense fallback={<div className="shader-stage" aria-hidden="true"><div className="shader-fallback" /></div>}>
@@ -44,10 +48,10 @@ const Hero = () => {
           </motion.p>
 
           <motion.div className="hero__actions" variants={item}>
-            <Link to="/explore" className="btn btn-solar">
+            <Link ref={magPrimary} to="/explore" className="btn btn-solar">
               <Compass size={18} strokeWidth={2} /> Begin Exploring
             </Link>
-            <Link to="/stories" className="btn btn-ghost">
+            <Link ref={magGhost} to="/stories" className="btn btn-ghost">
               <Play size={16} strokeWidth={2} /> Watch Stories
             </Link>
           </motion.div>
