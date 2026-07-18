@@ -48,7 +48,7 @@ const Hero = () => {
           </motion.p>
 
           <motion.div className="hero__actions" variants={item}>
-            <Link ref={magPrimary} to="/explore" className="btn btn-solar">
+            <Link ref={magPrimary} to="/explore" data-cursor="globe" className="btn btn-solar">
               <Compass size={18} strokeWidth={2} /> Begin Exploring
             </Link>
             <Link ref={magGhost} to="/stories" className="btn btn-ghost">

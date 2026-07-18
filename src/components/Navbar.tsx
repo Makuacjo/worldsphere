@@ -7,13 +7,14 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 
-const NAV_ITEMS = [
-  { to: '/explore', label: 'Explore', Icon: Compass },
+type NavItem = { to: string; label: string; Icon: typeof Compass; cursor?: string };
+const NAV_ITEMS: NavItem[] = [
+  { to: '/explore', label: 'Explore', Icon: Compass, cursor: 'globe' },
   { to: '/stories', label: 'Stories', Icon: BookOpen },
-  { to: '/maps', label: 'Maps', Icon: Map },
+  { to: '/maps', label: 'Maps', Icon: Map, cursor: 'compass' },
   { to: '/research', label: 'Research', Icon: FlaskConical },
   { to: '/communities', label: 'Communities', Icon: Users },
-  { to: '/ai', label: 'AI', Icon: Sparkles },
+  { to: '/ai', label: 'AI', Icon: Sparkles, cursor: 'brain' },
 ];
 
 /**
@@ -58,9 +59,9 @@ const FloatingNav = () => {
           </Link>
 
           <ul className="fnav__list">
-            {NAV_ITEMS.map(({ to, label, Icon }) => (
+            {NAV_ITEMS.map(({ to, label, Icon, cursor }) => (
               <li key={to}>
-                <Link to={to} className={`fnav__item ${isActive(to) ? 'is-active' : ''}`}>
+                <Link to={to} data-cursor={cursor} className={`fnav__item ${isActive(to) ? 'is-active' : ''}`}>
                   <Icon size={16} strokeWidth={1.75} />
                   <span>{label}</span>
                 </Link>
@@ -95,16 +96,16 @@ const FloatingNav = () => {
 
       {/* Mobile bottom dock */}
       <nav className="fdock" aria-label="Primary mobile">
-        <Link to="/explore" className={`fdock__item ${isActive('/explore') ? 'is-active' : ''}`}>
+        <Link to="/explore" data-cursor="globe" className={`fdock__item ${isActive('/explore') ? 'is-active' : ''}`}>
           <Compass size={22} strokeWidth={1.75} /><span>Explore</span>
         </Link>
         <Link to="/stories" className={`fdock__item ${isActive('/stories') ? 'is-active' : ''}`}>
           <BookOpen size={22} strokeWidth={1.75} /><span>Stories</span>
         </Link>
-        <Link to="/maps" className={`fdock__item ${isActive('/maps') ? 'is-active' : ''}`}>
+        <Link to="/maps" data-cursor="compass" className={`fdock__item ${isActive('/maps') ? 'is-active' : ''}`}>
           <Map size={22} strokeWidth={1.75} /><span>Maps</span>
         </Link>
-        <Link to="/ai" className={`fdock__item ${isActive('/ai') ? 'is-active' : ''}`}>
+        <Link to="/ai" data-cursor="brain" className={`fdock__item ${isActive('/ai') ? 'is-active' : ''}`}>
           <Sparkles size={22} strokeWidth={1.75} /><span>AI</span>
         </Link>
         <Link to={isAuthenticated ? '/profile' : '/login'} className={`fdock__item ${isActive('/profile') ? 'is-active' : ''}`}>
