@@ -934,7 +934,9 @@ a:hover { color: var(--highlight-color); }
   overflow: hidden;
   background: var(--bg);
 }
-.home-globe__stage { position: absolute; inset: 0; z-index: 0; }
+/* Display-only: never capture wheel/pointer, so the page scrolls over it. */
+.home-globe__stage { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.home-globe__stage canvas { pointer-events: none !important; }
 .home-globe::before {
   content: '';
   position: absolute;
