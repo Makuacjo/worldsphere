@@ -6,26 +6,44 @@
    ========================================================================== */
 
 :root {
-  /* ---- Brand color theme (unchanged names, used across all components) ---- */
-  --primary-color: #E0DED1;
-  --secondary-color: #4E6A5B;
-  --text-color: #282B1B;
-  --foundation-color: #283B28;
-  --highlight-color: #A68D4A;
+  /* ---- Raw palette (WORLDSPHERE cool editorial) ---- */
+  --mist: #D6D8DE;
+  --cloud: #B6C1D3;
+  --teal: #6B8487;
+  --ocean: #394C59;
+  --charcoal: #2F282D;
+  --forest: #4A6B3A;
+  --white: #FAFAFA;
+  --glass: rgba(255, 255, 255, 0.08);
+  --glass-strong: rgba(255, 255, 255, 0.14);
+  --border: rgba(255, 255, 255, 0.10);
+  --blur: 18px;
 
-  /* Surface colors (page/section backgrounds) */
-  --surface-color: #F4F2E9;
-  --surface-alt-color: #DEDCCF;
+  /* ---- Semantic surfaces (dark-first, immersive) ---- */
+  --bg: #10161A;
+  --bg-elev: #182126;
+  --bg-elev-2: #212C33;
+  --ink: var(--mist);
+  --ink-strong: var(--white);
+  --ink-dim: color-mix(in oklab, var(--cloud) 68%, transparent);
+  --accent: var(--teal);
+  --accent-2: var(--forest);
+  --accent-bright: #8FB2A9;
 
-  /* Feedback colors */
-  --error-color: #C97A7A;
-
-  /* Constant ink — intentionally does NOT flip in dark mode (navbar/footer,
-     gold buttons stay legible even as other variables invert). */
-  --on-dark-surface: #E0DED1;
+  /* ---- Legacy names remapped onto the new palette ----
+     Keeps not-yet-redesigned components on-brand during the phased rollout. */
+  --primary-color: var(--bg-elev-2);
+  --secondary-color: var(--teal);
+  --text-color: var(--mist);
+  --foundation-color: #0C1114;
+  --highlight-color: var(--accent-bright);
+  --surface-color: var(--bg);
+  --surface-alt-color: var(--bg-elev);
+  --error-color: #C98B98;
+  --on-dark-surface: var(--mist);
 
   /* ---- Type ---- */
-  --font-display: 'Fraunces', ui-serif, Georgia, 'Times New Roman', serif;
+  --font-display: 'Playfair Display', ui-serif, Georgia, 'Times New Roman', serif;
   --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 
   /* Fluid type scale (minor-third-ish, viewport aware) */
@@ -69,25 +87,37 @@
   --radius-sm: 6px;
   --radius-md: 12px;
   --radius-lg: 20px;
-  --shadow-sm: 0 2px 8px rgba(40, 37, 27, 0.06), 0 1px 2px rgba(40, 37, 27, 0.08);
-  --shadow-md: 0 12px 30px rgba(40, 37, 27, 0.1), 0 4px 8px rgba(40, 37, 27, 0.06);
-  --shadow-lg: 0 30px 60px rgba(20, 22, 14, 0.18), 0 10px 20px rgba(20, 22, 14, 0.1);
+  --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 14px 34px rgba(0, 0, 0, 0.42), 0 4px 10px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 34px 70px rgba(0, 0, 0, 0.55), 0 12px 24px rgba(0, 0, 0, 0.4);
 }
 
-/* Dark theme overrides, toggled via data-theme="dark" on <html> (ThemeContext) */
-[data-theme="dark"] {
-  --primary-color: #23261B;
-  --secondary-color: #7C9C89;
-  --text-color: #E5E3D8;
-  --foundation-color: #14160E;
-  --highlight-color: #C9AD6C;
-  --surface-color: #181A11;
-  --surface-alt-color: #1F2216;
-  --error-color: #E08A8A;
+/* The immersive dark palette above is the default. "light" is an optional day
+   variant, toggled via data-theme="light" on <html> (ThemeContext). */
+[data-theme="light"] {
+  --bg: #FAFAFA;
+  --bg-elev: #F1F3F6;
+  --bg-elev-2: #FFFFFF;
+  --ink: #2F282D;
+  --ink-strong: #10161A;
+  --ink-dim: color-mix(in oklab, #394C59 70%, transparent);
+  --glass: rgba(16, 22, 26, 0.05);
+  --glass-strong: rgba(16, 22, 26, 0.09);
+  --border: rgba(16, 22, 26, 0.12);
 
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 12px 30px rgba(0, 0, 0, 0.45), 0 4px 8px rgba(0, 0, 0, 0.35);
-  --shadow-lg: 0 30px 60px rgba(0, 0, 0, 0.6), 0 10px 20px rgba(0, 0, 0, 0.45);
+  --primary-color: #FFFFFF;
+  --secondary-color: #394C59;
+  --text-color: #2F282D;
+  --foundation-color: #2F282D;
+  --highlight-color: #4A6B3A;
+  --surface-color: #FAFAFA;
+  --surface-alt-color: #EEF1F4;
+  --error-color: #B4677A;
+  --on-dark-surface: #FAFAFA;
+
+  --shadow-sm: 0 2px 10px rgba(47, 40, 45, 0.06), 0 1px 2px rgba(47, 40, 45, 0.08);
+  --shadow-md: 0 14px 34px rgba(47, 40, 45, 0.1), 0 4px 10px rgba(47, 40, 45, 0.06);
+  --shadow-lg: 0 34px 70px rgba(47, 40, 45, 0.16), 0 12px 24px rgba(47, 40, 45, 0.1);
 }
 
 /* ---------------------------------------------------------------- Base ---- */
