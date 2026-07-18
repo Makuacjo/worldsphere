@@ -9,9 +9,13 @@ const SmoothScroll = () => {
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
+    // lerp-based momentum feels smooth but stays snappy/responsive; a bigger
+    // wheelMultiplier keeps it fast. Native (non-smoothed) scrolling on touch.
     const lenis = new Lenis({
-      duration: 1.1,
-      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      lerp: 0.14,
+      wheelMultiplier: 1.15,
+      smoothWheel: true,
+      syncTouch: false,
     });
 
     let raf = 0;
