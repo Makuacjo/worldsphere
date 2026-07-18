@@ -5,7 +5,6 @@ import { Spinner } from 'react-bootstrap';
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import ConstellationCursor from './components/ConstellationCursor';
-import SmoothScroll from './components/SmoothScroll';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 
@@ -100,7 +99,6 @@ function App() {
       <AuthProvider>
         {/* reducedMotion="user" makes every framer animation honor the OS setting */}
         <MotionConfig reducedMotion="user">
-          <SmoothScroll />
           <ConstellationCursor />
           <RouterProvider router={router} />
         </MotionConfig>
