@@ -54,7 +54,7 @@ def ai_ask(req: AskRequest) -> StreamingResponse:
     if not ai.available():
         raise HTTPException(
             status_code=503,
-            detail="AI is not configured. Set ANTHROPIC_API_KEY in the ml-service environment.",
+            detail="AI is not configured. Set OPENROUTER_API_KEY in the ml-service environment.",
         )
     question = req.question.strip()
     if not question:

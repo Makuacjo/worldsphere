@@ -15,21 +15,20 @@ The API contract matches the frontend in `../src/services/conservationApi.ts`.
 | GET    | `/insights` | `InsightsResponse` (distributions, importances, …) |
 | POST   | `/ai/ask`   | Streamed plain-text answer from Claude (AI Explorer) |
 
-## AI Explorer (Claude)
+## AI Explorer (OpenRouter)
 
-The `/ai/ask` endpoint streams natural-language answers from Claude. The API key
-stays server-side — the browser never sees it. Set it before starting uvicorn:
+The `/ai/ask` endpoint streams natural-language answers via OpenRouter
+(OpenAI-compatible). The API key stays server-side — the browser never sees it.
+Put it in `ml-service/.env` (gitignored, loaded automatically at startup):
 
-```bash
-# Windows (PowerShell):
-$env:ANTHROPIC_API_KEY = "sk-ant-..."
-# macOS / Linux:
-# export ANTHROPIC_API_KEY="sk-ant-..."
+```
+OPENROUTER_API_KEY=sk-or-v1-...
+# AI_MODEL=openai/gpt-4o-mini   # optional; any OpenRouter model id
 ```
 
-Optional: `AI_MODEL` overrides the model (default `claude-opus-4-8`). Without a
-key, `/ai/ask` returns a 503 and the AI Explorer shows a "not configured" state —
-everything else keeps working.
+Or set it in the shell before `uvicorn` (`$env:OPENROUTER_API_KEY = "..."`).
+Without a key, `/ai/ask` returns 503 and the AI Explorer shows a "not configured"
+state — everything else keeps working.
 
 ## Run it
 
