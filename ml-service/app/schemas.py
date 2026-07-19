@@ -48,3 +48,39 @@ class InsightsResponse(BaseModel):
     average_range_size_by_category: dict[str, float]
     risk_by_generation_length: list[RiskByBucket]
     risk_by_range_size: list[RiskByBucket]
+
+
+# ---- auth + favorites ----------------------------------------------------
+
+class SignupRequest(BaseModel):
+    name: str
+    email: str
+    password: str
+
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+
+class UserOut(BaseModel):
+    id: int
+    name: str
+    email: str
+
+
+class AuthResponse(BaseModel):
+    token: str
+    user: UserOut
+
+
+class FavoriteIn(BaseModel):
+    key: str
+    source: str  # 'gbif' | 'catalog'
+    name: str
+    scientificName: str | None = None
+    image: str | None = None
+
+
+class FavoriteOut(FavoriteIn):
+    id: int

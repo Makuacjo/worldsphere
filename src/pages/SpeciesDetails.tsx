@@ -4,6 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import { allWildlife } from '../data';
 import { getOptimizedImage } from '../utils/cloudinary';
 import Reveal from '../components/Reveal';
+import FavoriteButton from '../components/FavoriteButton';
 import '../index.css';
 
 const SpeciesDetails = () => {
@@ -33,7 +34,13 @@ const SpeciesDetails = () => {
         <Container>
           <span className="species-hero__badge">{entry.category}</span>
           <h1 className="species-hero__title">{entry.name}</h1>
-          <p className="species-hero__sub">{subtitle}</p>
+          <div className="d-flex align-items-center gap-3 flex-wrap">
+            <p className="species-hero__sub mb-0">{subtitle}</p>
+            <FavoriteButton
+              size={20}
+              fav={{ source: 'catalog', key: entry.id, name: entry.name, scientificName: subtitle, image: entry.image }}
+            />
+          </div>
         </Container>
       </section>
 

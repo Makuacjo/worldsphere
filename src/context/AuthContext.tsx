@@ -1,65 +1,113 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
-
-interface User {
-    name: string;
-    email: string;
-}
+import { createContext, useContext, useCallback, useEffect, useState, type ReactNode } from 'react';
+import {
+  apiSignup, apiLogin, apiMe, apiGetFavorites, apiAddFavorite, apiRemoveFavorite,
+  type User, type Favorite, type FavoriteInput,
+} from '../services/auth';
 
 interface AuthContextType {
-    user: User | null;
-    isAuthenticated: boolean;
-    signup: (name: string, email: string) => void;
-    login: (email: string) => void;
-    logout: () => void;
+  user: User | null;
+  isAuthenticated: boolean;
+  loading: boolean;
+  signup: (name: string, email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => void;
+  // favorites
+  favorites: Favorite[];
+  isFavorite: (source: string, key: string) => boolean;
+  toggleFavorite: (fav: FavoriteInput) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-const STORAGE_KEY = 'worldsphere_user';
+const TOKEN_KEY = 'worldsphere_token';
+
+const favId = (source: string, key: string) => `${source}:${key}`;
 
 /**
- * IMPORTANT — this is a front-end-only placeholder, not real authentication.
- *
- * There is no backend yet (see SCHEMA.md), so this context can't actually verify
- * a password — it exists purely so the Signup/Login/Profile pages have something
- * to call. It intentionally never accepts or stores a password anywhere, even in
- * localStorage, so nobody mistakes this for something secure.
- *
- * When the real API exists, replace `signup`/`login` below with requests to
- * POST /api/auth/signup and /api/auth/login (see SCHEMA.md's User model), and
- * store the returned JWT/session instead of a plain user object.
+ * Real authentication against the ml-service (signed token in localStorage) plus
+ * per-user favorites. Replaces the earlier front-end-only placeholder.
  */
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-    const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(() => localStorage.getItem(TOKEN_KEY));
+  const [user, setUser] = useState<User | null>(null);
+  const [favorites, setFavorites] = useState<Favorite[]>([]);
+  const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (!stored) return;
-        try {
-            setUser(JSON.parse(stored));
-        } catch {
-            localStorage.removeItem(STORAGE_KEY);
-        }
-    }, []);
+  const applySession = useCallback((nextToken: string, nextUser: User) => {
+    localStorage.setItem(TOKEN_KEY, nextToken);
+    setToken(nextToken);
+    setUser(nextUser);
+  }, []);
 
-    const persist = (next: User | null) => {
-        setUser(next);
-        if (next) localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-        else localStorage.removeItem(STORAGE_KEY);
-    };
+  const logout = useCallback(() => {
+    localStorage.removeItem(TOKEN_KEY);
+    setToken(null);
+    setUser(null);
+    setFavorites([]);
+  }, []);
 
-    const signup = (name: string, email: string) => persist({ name, email });
-    const login = (email: string) => persist({ name: email.split('@')[0], email });
-    const logout = () => persist(null);
+  // Rehydrate from a stored token on mount.
+  useEffect(() => {
+    if (!token) { setLoading(false); return; }
+    let alive = true;
+    Promise.all([apiMe(token), apiGetFavorites(token)])
+      .then(([me, favs]) => {
+        if (!alive) return;
+        setUser(me);
+        setFavorites(favs);
+      })
+      .catch(() => { if (alive) logout(); })
+      .finally(() => { if (alive) setLoading(false); });
+    return () => { alive = false; };
+  }, [token, logout]);
 
-    return (
-        <AuthContext.Provider value={{ user, isAuthenticated: !!user, signup, login, logout }}>
-            {children}
-        </AuthContext.Provider>
-    );
+  const signup = async (name: string, email: string, password: string) => {
+    const { token: t, user: u } = await apiSignup(name, email, password);
+    applySession(t, u);
+    setFavorites([]);
+  };
+
+  const login = async (email: string, password: string) => {
+    const { token: t, user: u } = await apiLogin(email, password);
+    applySession(t, u);
+    setFavorites(await apiGetFavorites(t).catch(() => []));
+  };
+
+  const isFavorite = (source: string, key: string) =>
+    favorites.some(f => favId(f.source, f.key) === favId(source, key));
+
+  const toggleFavorite = async (fav: FavoriteInput) => {
+    if (!token) throw new Error('Sign in to save favorites.');
+    if (isFavorite(fav.source, fav.key)) {
+      // Optimistic remove.
+      setFavorites(prev => prev.filter(f => favId(f.source, f.key) !== favId(fav.source, fav.key)));
+      await apiRemoveFavorite(token, fav.source, fav.key).catch(() => {});
+    } else {
+      const created = await apiAddFavorite(token, fav);
+      setFavorites(prev => [created, ...prev.filter(f => favId(f.source, f.key) !== favId(fav.source, fav.key))]);
+    }
+  };
+
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthenticated: !!user,
+        loading,
+        signup,
+        login,
+        logout,
+        favorites,
+        isFavorite,
+        toggleFavorite,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 export const useAuth = () => {
-    const ctx = useContext(AuthContext);
-    if (!ctx) throw new Error('useAuth must be used within an AuthProvider');
-    return ctx;
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error('useAuth must be used within an AuthProvider');
+  return ctx;
 };

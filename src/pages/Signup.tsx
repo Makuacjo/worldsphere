@@ -39,6 +39,7 @@ const Signup = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [touched, setTouched] = useState<Touched>({});
     const [submitting, setSubmitting] = useState(false);
+    const [serverError, setServerError] = useState('');
 
     // Already signed in — the signup form has nothing left to offer them.
     useEffect(() => {
@@ -56,18 +57,21 @@ const Signup = () => {
 
     const markTouched = (field: keyof Touched) => setTouched(prev => ({ ...prev, [field]: true }));
 
-    const handleSubmit = (e: FormEvent) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         setTouched({ name: true, email: true, password: true, confirmPassword: true });
+        setServerError('');
         if (!isValid) return;
 
         setSubmitting(true);
-        // Simulated latency — becomes a real POST /api/auth/signup call
-        // once the backend from SCHEMA.md exists.
-        setTimeout(() => {
-            signup(name.trim(), email.trim());
+        try {
+            await signup(name.trim(), email.trim(), password);
             navigate('/profile');
-        }, 500);
+        } catch (err) {
+            setServerError(err instanceof Error ? err.message : 'Could not create your account.');
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     return (
@@ -155,14 +159,17 @@ const Signup = () => {
                                     <Form.Control.Feedback type="invalid">{errors.confirmPassword}</Form.Control.Feedback>
                                 </Form.Group>
 
+                                {serverError && (
+                                    <p className="small mb-3" style={{ color: 'var(--error-color)' }}>{serverError}</p>
+                                )}
+
                                 <Button
                                     type="submit"
                                     disabled={submitting}
-                                    className="w-100 border-0 fw-bold d-flex align-items-center justify-content-center gap-2"
-                                    style={{ backgroundColor: 'var(--highlight-color)', color: 'var(--foundation-color)' }}
+                                    className="btn-solar w-100 justify-content-center"
                                 >
                                     {submitting && <Spinner animation="border" size="sm" />}
-                                    {submitting ? 'Creating Account...' : 'Sign Up'}
+                                    {submitting ? 'Creating Account…' : 'Sign Up'}
                                 </Button>
                             </Form>
 

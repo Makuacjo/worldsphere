@@ -20,6 +20,7 @@ const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [touched, setTouched] = useState<Touched>({});
     const [submitting, setSubmitting] = useState(false);
+    const [serverError, setServerError] = useState('');
 
     // Already signed in — send them straight to their profile.
     useEffect(() => {
@@ -34,19 +35,21 @@ const Login = () => {
 
     const markTouched = (field: keyof Touched) => setTouched(prev => ({ ...prev, [field]: true }));
 
-    const handleSubmit = (e: FormEvent) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         setTouched({ email: true, password: true });
+        setServerError('');
         if (!isValid) return;
 
         setSubmitting(true);
-        // NOTE: there's no backend yet (see AuthContext.tsx), so this can't
-        // actually verify the password — it just signs you in as this email
-        // so the Profile page has something to work with.
-        setTimeout(() => {
-            login(email.trim());
+        try {
+            await login(email.trim(), password);
             navigate('/profile');
-        }, 400);
+        } catch (err) {
+            setServerError(err instanceof Error ? err.message : 'Could not sign in.');
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     return (
@@ -98,14 +101,17 @@ const Login = () => {
                                     </InputGroup>
                                 </Form.Group>
 
+                                {serverError && (
+                                    <p className="small mb-3" style={{ color: 'var(--error-color)' }}>{serverError}</p>
+                                )}
+
                                 <Button
                                     type="submit"
                                     disabled={submitting}
-                                    className="w-100 border-0 fw-bold d-flex align-items-center justify-content-center gap-2"
-                                    style={{ backgroundColor: 'var(--highlight-color)', color: 'var(--foundation-color)' }}
+                                    className="btn-solar w-100 justify-content-center"
                                 >
                                     {submitting && <Spinner animation="border" size="sm" />}
-                                    {submitting ? 'Logging In...' : 'Log In'}
+                                    {submitting ? 'Logging In…' : 'Log In'}
                                 </Button>
                             </Form>
 

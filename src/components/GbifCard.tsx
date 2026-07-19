@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchTaxonImage, type GbifCard as Card } from '../services/gbif';
+import FavoriteButton from './FavoriteButton';
 
 /** Species card for GBIF results — lazily fetches a representative image
  *  once it scrolls near the viewport, so a grid isn't N image calls up front. */
@@ -40,6 +41,10 @@ const GbifSpeciesCard = ({ card }: { card: Card }) => {
         )}
         <div className="gcard__scrim" />
         {card.status && <span className={`gcard__status s-${card.status}`}>{card.status}</span>}
+        <FavoriteButton
+          className="gcard__fav"
+          fav={{ source: 'gbif', key: String(card.key), name: card.name, scientificName: card.scientificName, image: img }}
+        />
       </div>
       <div className="gcard__body">
         <span className="gcard__kingdom">{card.kingdom}</span>

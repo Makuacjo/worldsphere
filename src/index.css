@@ -1123,6 +1123,53 @@ a:hover { color: var(--highlight-color); }
 .gbif-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.6rem; }
 .gbif-gallery img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: var(--radius-sm); }
 
+/* --------------------------------------------------------- Favorites ----- */
+.fav-btn {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--bg) 55%, transparent);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border);
+  color: #fff;
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease-out-quart), color var(--dur-fast) var(--ease-out-quart), background var(--dur-fast) var(--ease-out-quart);
+}
+.fav-btn:hover { transform: scale(1.08); background: color-mix(in oklab, var(--bg) 72%, transparent); }
+.fav-btn.is-active { color: #E5717F; border-color: color-mix(in oklab, #E5717F 55%, var(--border)); }
+.gcard__fav { position: absolute; top: 0.7rem; left: 0.7rem; z-index: 1; width: 34px; height: 34px; }
+
+.fav-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--space-sm); }
+.fav-item { position: relative; border-radius: var(--radius-md); overflow: hidden; background: var(--bg-elev); border: 1px solid var(--border); }
+.fav-item__media { display: block; aspect-ratio: 4 / 3; }
+.fav-item__media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.fav-item__ph { width: 100%; height: 100%; background: linear-gradient(135deg, var(--bg-elev), var(--bg-elev-2)); }
+.fav-item__body { padding: 0.8rem 0.9rem; }
+.fav-item__name { display: block; color: var(--ink-strong); font-weight: 600; text-decoration: none; }
+.fav-item__name:hover { color: var(--accent-bright); }
+.fav-item__sci { display: block; font-style: italic; font-size: 0.78rem; color: var(--ink-dim); }
+.fav-item__remove {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: color-mix(in oklab, var(--bg) 62%, transparent);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--border);
+  color: #fff;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out-quart);
+}
+.fav-item__remove:hover { background: color-mix(in oklab, #C9605F 72%, transparent); }
+
 /* ------------------------------------------------------ Story cards ------ */
 .story {
   position: relative;

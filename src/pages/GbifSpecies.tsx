@@ -5,6 +5,7 @@ import {
   getSpecies, getDescription, getGallery, getOccurrenceCount, getCountries,
   gbifOrgUrl, STATUS_LABEL, GbifError, type GbifTaxon,
 } from '../services/gbif';
+import FavoriteButton from '../components/FavoriteButton';
 
 const STATUS_CODE: Record<string, string> = {
   LEAST_CONCERN: 'LC', NEAR_THREATENED: 'NT', VULNERABLE: 'VU',
@@ -74,7 +75,13 @@ const GbifSpecies = () => {
         <div className="container">
           {status && <span className="species-hero__badge">{STATUS_LABEL[status] ?? status}</span>}
           <h1 className="species-hero__title" style={{ textTransform: 'capitalize' }}>{title}</h1>
-          <p className="species-hero__sub">{taxon.scientificName ?? taxon.canonicalName}</p>
+          <div className="d-flex align-items-center gap-3 flex-wrap">
+            <p className="species-hero__sub mb-0">{taxon.scientificName ?? taxon.canonicalName}</p>
+            <FavoriteButton
+              size={20}
+              fav={{ source: 'gbif', key: String(id), name: title, scientificName: taxon.scientificName ?? taxon.canonicalName ?? null, image: hero ?? null }}
+            />
+          </div>
         </div>
       </section>
 
