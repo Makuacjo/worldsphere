@@ -527,12 +527,10 @@ a:hover { color: var(--highlight-color); }
   text-decoration: none;
   white-space: nowrap;
 }
-.fnav__brand-logo {
-  display: block;
-  width: auto;
-  object-fit: contain;
+.fnav__brand-mark {
+  flex: none;
+  color: #ff4f5e;
 }
-.fnav__brand-logo { height: 1.45rem; }
 .footer__brand-logo {
   display: block;
   width: auto;
@@ -598,7 +596,7 @@ a:hover { color: var(--highlight-color); }
 @media (max-width: 1080px) {
   .fnav { width: calc(100% - 1rem); }
   .fnav__pill { gap: 0.35rem; padding-inline: 0.65rem; }
-  .fnav__brand-logo { height: 1.25rem; }
+  .fnav__brand { font-size: 0.84rem; }
   .fnav__item { gap: 0.25rem; padding: 0.5rem 0.45rem; font-size: 0.78rem; }
   .fnav__actions { gap: 0.15rem; }
   .fnav__profile { padding-inline: 0.65rem; }
@@ -608,13 +606,15 @@ a:hover { color: var(--highlight-color); }
 /* Mobile bottom dock */
 .fdock {
   position: fixed;
-  bottom: 0.9rem;
+  bottom: max(0.5rem, env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(-50%);
   z-index: var(--z-nav);
   display: none;
   align-items: center;
-  gap: 0.15rem;
+  width: min(25rem, calc(100% - 1rem));
+  justify-content: space-between;
+  gap: 0.25rem;
   padding: 0.4rem;
   border-radius: 22px;
   background: color-mix(in oklab, var(--bg-elev) 78%, transparent);
@@ -628,17 +628,52 @@ a:hover { color: var(--highlight-color); }
   flex-direction: column;
   align-items: center;
   gap: 3px;
-  padding: 0.45rem 0.7rem;
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 48px;
+  justify-content: center;
+  padding: 0.4rem 0.25rem;
+  border: 0;
   border-radius: 15px;
+  background: transparent;
   color: var(--ink-dim);
   text-decoration: none;
   font-size: 0.62rem;
   letter-spacing: 0.02em;
+  font-family: inherit;
   transition: color var(--dur-fast) var(--ease-out-quart), background var(--dur-fast) var(--ease-out-quart);
 }
 .fdock__item.is-active { color: var(--ink-strong); background: var(--glass-strong); }
+.fdock-more {
+  position: fixed;
+  right: max(0.75rem, env(safe-area-inset-right));
+  bottom: calc(5.75rem + env(safe-area-inset-bottom));
+  z-index: var(--z-nav);
+  display: none;
+  width: min(15rem, calc(100% - 1.5rem));
+  padding: 0.4rem;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg-elev);
+  box-shadow: var(--shadow-md);
+}
+.fdock-more a {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 48px;
+  padding: 0.65rem 0.8rem;
+  border-radius: 10px;
+  color: var(--ink-strong);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.fdock-more a:active,
+.fdock-more a.is-active { background: var(--glass-strong); }
 @media (max-width: 860px) {
   .fdock { display: flex; }
+  .fdock-more { display: block; }
   body { padding-bottom: 5.5rem; }
 }
 
@@ -1384,7 +1419,16 @@ a:hover { color: var(--highlight-color); }
   transition: transform var(--dur-fast) var(--ease-out-quart), color var(--dur-fast) var(--ease-out-quart), background var(--dur-fast) var(--ease-out-quart);
 }
 .fav-btn:hover { transform: scale(1.08); background: color-mix(in oklab, var(--bg) 72%, transparent); }
-.fav-btn.is-active { color: #E5717F; border-color: color-mix(in oklab, #E5717F 55%, var(--border)); }
+.fav-btn.is-active { color: #ef3340; border-color: color-mix(in oklab, #ef3340 55%, var(--border)); }
+.fav-btn.is-active svg { animation: favorite-pop 220ms var(--ease-out-expo); }
+@keyframes favorite-pop {
+  0% { transform: scale(0.72); }
+  60% { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fav-btn.is-active svg { animation: none; }
+}
 .gcard__fav { position: absolute; top: 0.7rem; left: 0.7rem; z-index: 3; width: 34px; height: 34px; }
 
 .fav-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--space-sm); }

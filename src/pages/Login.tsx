@@ -72,7 +72,6 @@ const Login = () => {
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         onBlur={() => markTouched('email')}
-                                        placeholder="jane@example.com"
                                         autoComplete="email"
                                         autoFocus
                                         isInvalid={!!touched.email && !!errors.email}

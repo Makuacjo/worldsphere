@@ -94,7 +94,6 @@ const Signup = () => {
                                         value={name}
                                         onChange={(e) => setName(e.target.value)}
                                         onBlur={() => markTouched('name')}
-                                        placeholder="Jane Doe"
                                         autoComplete="name"
                                         autoFocus
                                         isInvalid={!!touched.name && !!errors.name}
@@ -109,7 +108,6 @@ const Signup = () => {
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         onBlur={() => markTouched('email')}
-                                        placeholder="jane@example.com"
                                         autoComplete="email"
                                         isInvalid={!!touched.email && !!errors.email}
                                     />

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Compass, BookOpen, Map, FlaskConical, Users, Sparkles,
-  User, Search, Sun, Moon, Plane,
+  User, Search, Sun, Moon, Plane, Menu, X, Globe2,
 } from 'lucide-react';
 import { useAuth } from '../context/auth';
 import { useTheme } from '../context/theme';
@@ -31,6 +31,7 @@ const FloatingNav = () => {
 
   const [hidden, setHidden] = useState(false);
   const [atTop, setAtTop] = useState(true);
+  const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
   const lastY = useRef(0);
 
   useEffect(() => {
@@ -55,7 +56,8 @@ const FloatingNav = () => {
       <header className={`fnav ${hidden ? 'is-hidden' : ''} ${atTop ? 'is-top' : ''}`}>
         <nav className="fnav__pill" aria-label="Primary">
           <Link to="/" className="fnav__brand">
-            <img className="fnav__brand-logo" src="/WorldSphere-Logo-Package/WorldSphere-Logo.png" alt="WorldSphere" />
+            <Globe2 className="fnav__brand-mark" size={20} strokeWidth={1.8} aria-hidden="true" />
+            <span>WORLDSPHERE</span>
           </Link>
 
           <ul className="fnav__list">
@@ -94,16 +96,25 @@ const FloatingNav = () => {
         </nav>
       </header>
 
-      {/* Mobile bottom dock */}
+      {mobileMoreOpen && (
+        <nav id="mobile-more-navigation" className="fdock-more" aria-label="More mobile navigation">
+          <Link to="/stories" className={isActive('/stories') ? 'is-active' : ''} onClick={() => setMobileMoreOpen(false)}><BookOpen size={20} aria-hidden="true" /><span>Stories</span></Link>
+          <Link to="/research" className={isActive('/research') ? 'is-active' : ''} onClick={() => setMobileMoreOpen(false)}><FlaskConical size={20} aria-hidden="true" /><span>Research</span></Link>
+          <Link to={isAuthenticated ? '/profile' : '/login'} className={isActive('/profile') || isActive('/login') ? 'is-active' : ''} onClick={() => setMobileMoreOpen(false)}><User size={20} aria-hidden="true" /><span>Profile</span></Link>
+        </nav>
+      )}
+
+      {/* Mobile bottom dock: four primary destinations and progressive disclosure. */}
       <nav className="fdock" aria-label="Primary mobile">
-        {NAV_ITEMS.map(({ to, label, Icon }) => (
+        {NAV_ITEMS.filter(({ to }) => ['/explore', '/tourism', '/maps', '/ai'].includes(to)).map(({ to, label, Icon }) => (
           <Link key={to} to={to} className={`fdock__item ${isActive(to) ? 'is-active' : ''}`}>
             <Icon size={21} strokeWidth={1.75} aria-hidden="true" /><span>{label}</span>
           </Link>
         ))}
-        <Link to={isAuthenticated ? '/profile' : '/login'} className={`fdock__item ${isActive('/profile') ? 'is-active' : ''}`}>
-          <User size={21} strokeWidth={1.75} aria-hidden="true" /><span>Profile</span>
-        </Link>
+        <button type="button" className={`fdock__item ${mobileMoreOpen ? 'is-active' : ''}`} aria-expanded={mobileMoreOpen} aria-controls="mobile-more-navigation" onClick={() => setMobileMoreOpen(open => !open)}>
+          {mobileMoreOpen ? <X size={21} aria-hidden="true" /> : <Menu size={21} aria-hidden="true" />}
+          <span>More</span>
+        </button>
       </nav>
     </>
   );

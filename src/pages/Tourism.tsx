@@ -2,10 +2,11 @@ import { lazy, Suspense, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight, CalendarDays, Check, ChevronRight, CloudSun, Compass,
-  Heart, Hotel, Info, Map, MapPin, Plane, Search, ShieldCheck,
+  Hotel, Info, Map, MapPin, Plane, Search, ShieldCheck,
   Sparkles, Star, Sun, TentTree, Users, Utensils, WalletCards,
 } from 'lucide-react';
 import Reveal from '../components/Reveal';
+import FavoriteButton from '../components/FavoriteButton';
 import { destinationSlug } from '../data/destinationGuides';
 import { tourismImageManifest } from '../data/tourismImages.generated';
 import './Tourism.css';
@@ -146,7 +147,7 @@ const filtered = useMemo(() => DESTINATIONS
                   <article className="destination-card">
                     <div className="destination-card__media">
                       <Link className="destination-card__image-link" to={`/destinations/${destinationSlug(item.name)}`} aria-label={`Open the ${item.name} travel guide`}><img src={item.image} alt={`${item.name}, Kenya`} loading="lazy" decoding="async" /></Link>
-                      <button type="button" aria-label={`Save ${item.name}`}><Heart size={18} /></button><span>{item.category}</span>
+                      <FavoriteButton fav={{ source: 'destination', key: destinationSlug(item.name), name: item.name, image: item.image }} size={19} /><span>{item.category}</span>
                     </div>
                     <div className="destination-card__body">
                       <div className="destination-card__title"><div><p><MapPin size={13} /> {item.county} County</p><h3><Link to={`/destinations/${destinationSlug(item.name)}`}>{item.name}</Link></h3></div><span><Star size={14} fill="currentColor" /> {item.rating}</span></div>
