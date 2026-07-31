@@ -1,9 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Container, Row, Col, Form } from 'react-bootstrap';
 import { allWildlife } from '../data';
 import AnimatedCardGrid from '../components/AnimatedCardGrid';
 import type { WildlifeEntry } from '../types/wildlife';
+import { recordSearch } from '../services/accountApi';
 
 type CategoryFilter = 'all' | 'animal' | 'plant' | 'water';
 
@@ -19,6 +20,12 @@ const Search = () => {
   const [query, setQuery] = useState(searchParams.get('q') ?? '');
   const [category, setCategory] = useState<CategoryFilter>('all');
 
+  useEffect(() => {
+    const value = query.trim();
+    if (value.length < 2) return;
+    const timer = window.setTimeout(() => recordSearch(value, 'catalog').catch(() => undefined), 800);
+    return () => window.clearTimeout(timer);
+  }, [query]);
   const results = useMemo(() => {
     const trimmedQuery = query.trim().toLowerCase();
     return allWildlife.filter(entry => {

@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_ML_API_URL ?? 'http://localhost:8000';
+import { API_BASE_URL } from './apiConfig';
 
 export type TaxClass = 'Mammalia' | 'Aves' | 'Reptilia' | 'Amphibia' | 'Actinopterygii';
 export type Habitat = 'Forest' | 'Grassland' | 'Wetland' | 'Marine' | 'Freshwater' | 'Desert' | 'Mountain';

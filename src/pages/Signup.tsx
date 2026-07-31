@@ -1,8 +1,8 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { Container, Row, Col, Form, Button, InputGroup, Spinner } from 'react-bootstrap';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/auth';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -31,6 +31,7 @@ const getPasswordStrength = (password: string): { label: string; ratio: number; 
 const Signup = () => {
     const { signup, isAuthenticated } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
@@ -66,7 +67,9 @@ const Signup = () => {
         setSubmitting(true);
         try {
             await signup(name.trim(), email.trim(), password);
-            navigate('/profile');
+            const requested = (location.state as { from?: string } | null)?.from || sessionStorage.getItem('worldsphere_auth_return');
+            sessionStorage.removeItem('worldsphere_auth_return');
+            navigate(requested || '/profile', { replace: true });
         } catch (err) {
             setServerError(err instanceof Error ? err.message : 'Could not create your account.');
         } finally {

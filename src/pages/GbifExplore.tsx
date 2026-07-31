@@ -2,14 +2,17 @@ import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import { Search, Loader2 } from 'lucide-react';
 import GbifSpeciesCard from '../components/GbifCard';
 import { searchSpecies, GbifError, type GbifCard, type KingdomKey } from '../services/gbif';
+import { recordSearch } from '../services/accountApi';
 
-const SUGGESTIONS = ['Panthera', 'Elephant', 'Oak', 'Coral', 'Eagle', 'Frog', 'Shark', 'Orchid'];
+const SUGGESTIONS = ['Panthera', 'Elephant', 'Oak', 'Coral', 'Eagle', 'Frog'];
 const KINGDOMS: (KingdomKey | 'All')[] = ['All', 'Animals', 'Plants', 'Fungi'];
 const PAGE = 18;
 
+type RunArgs = [string, KingdomKey | 'All', number, boolean];
+
 const GbifExplore = () => {
   const [query, setQuery] = useState('');
-  const [submitted, setSubmitted] = useState('');
+  const [submitted, setSubmitted] = useState(SUGGESTIONS[0]);
   const [kingdom, setKingdom] = useState<KingdomKey | 'All'>('All');
   const [cards, setCards] = useState<GbifCard[]>([]);
   const [total, setTotal] = useState(0);
@@ -17,9 +20,11 @@ const GbifExplore = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const reqId = useRef(0);
+  const lastArgs = useRef<RunArgs | null>(null);
 
   const run = useCallback(async (q: string, king: KingdomKey | 'All', off: number, append: boolean) => {
     const id = ++reqId.current;
+    lastArgs.current = [q, king, off, append];
     setLoading(true);
     setError('');
     try {
@@ -40,10 +45,12 @@ const GbifExplore = () => {
     }
   }, []);
 
+  // Replay the last attempted request (ref read in a handler, never in render).
+  const retry = () => { if (lastArgs.current) run(...lastArgs.current); };
+
   // Seed the page with a first result set.
   useEffect(() => {
-    setSubmitted(SUGGESTIONS[0]);
-    run(SUGGESTIONS[0], 'All', 0, false);
+    queueMicrotask(() => run(SUGGESTIONS[0], 'All', 0, false));
   }, [run]);
 
   const submit = (e: FormEvent) => {
@@ -51,12 +58,14 @@ const GbifExplore = () => {
     const q = query.trim();
     if (!q) return;
     setSubmitted(q);
+    recordSearch(q, 'gbif').catch(() => undefined);
     run(q, kingdom, 0, false);
   };
 
   const pickSuggestion = (s: string) => {
     setQuery(s);
     setSubmitted(s);
+    recordSearch(s, 'gbif').catch(() => undefined);
     run(s, kingdom, 0, false);
   };
 
@@ -90,17 +99,20 @@ const GbifExplore = () => {
             </button>
           </form>
 
-          <div className="stories__filters" style={{ marginTop: '1rem' }}>
+          <div className="stories__filters chip-row" style={{ marginTop: '1rem' }} role="group" aria-label="Search suggestions">
+            <span className="chip-row__label">Try</span>
             {SUGGESTIONS.map(s => (
               <button key={s} type="button" className="chip chip--sm" onClick={() => pickSuggestion(s)}>{s}</button>
             ))}
           </div>
-          <div className="stories__filters">
+          <div className="stories__filters chip-row" role="group" aria-label="Filter by kingdom">
+            <span className="chip-row__label">Kingdom</span>
             {KINGDOMS.map(k => (
               <button
                 key={k}
                 type="button"
                 className={`chip ${kingdom === k ? 'is-active' : ''}`}
+                aria-pressed={kingdom === k}
                 onClick={() => pickKingdom(k)}
               >
                 {k}
@@ -109,16 +121,28 @@ const GbifExplore = () => {
           </div>
         </header>
 
-        {error && <p className="empty-note">{error}</p>}
-
-        {!error && (
+        {/* A failed request never wipes results the user is already reading:
+            the full-bleed error only shows when there's nothing on screen. */}
+        {error && cards.length === 0 ? (
+          <div className="empty-note" role="alert">
+            <p>{error}</p>
+            <button type="button" className="btn btn-solar" onClick={retry}>Try again</button>
+          </div>
+        ) : (
           <>
-            <p className="result-count">
-              <strong>{total.toLocaleString()}</strong> species match “{submitted}”
+            <p className="result-count" aria-live="polite">
+              <strong>{total.toLocaleString()}</strong> species match “<em>{submitted}</em>”
             </p>
             <div className="gcard-grid">
               {cards.map(card => <GbifSpeciesCard key={card.key} card={card} />)}
             </div>
+
+            {error && (
+              <div className="inline-error" role="alert">
+                <span>{error}</span>
+                <button type="button" className="btn btn-ghost btn-sm" onClick={retry}>Retry</button>
+              </div>
+            )}
 
             {cards.length > 0 && cards.length < total && (
               <div className="text-center" style={{ marginTop: 'var(--space-lg)' }}>

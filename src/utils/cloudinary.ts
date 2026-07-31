@@ -12,24 +12,21 @@ export const getOptimizedImage = (url: string, type: 'card' | 'hero' | 'thumb' =
   const imagePath = splitUrl[1];
 
   // 2. Define transformation strings based on the UI needs
-  let transformations = '';
-
-  switch (type) {
+  const transformations = (() => {
+    switch (type) {
     case 'hero':
       // High quality, wide, optimized for large screens
-      transformations = 'c_fill,w_1600,h_900,g_auto,q_auto,f_auto/';
-      break;
+      return 'c_fill,w_1600,h_900,g_auto,q_auto,f_auto/';
     case 'card':
       // Perfect 3:2 ratio for your grid cards
-      transformations = 'c_fill,w_800,h_533,g_auto,q_auto,f_auto/';
-      break;
+      return 'c_fill,w_800,h_533,g_auto,q_auto,f_auto/';
     case 'thumb':
       // Small square for search results or footer
-      transformations = 'c_fill,w_150,h_150,g_auto,q_auto,f_auto/';
-      break;
+      return 'c_fill,w_150,h_150,g_auto,q_auto,f_auto/';
     default:
-      transformations = 'q_auto,f_auto/';
-  }
+      return 'q_auto,f_auto/';
+    }
+  })();
 
   // 3. Return the modified URL
   return `${baseUrl}${transformations}${imagePath}`;

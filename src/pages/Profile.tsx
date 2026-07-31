@@ -1,8 +1,8 @@
 import { Container, Row, Col, Button, Spinner } from 'react-bootstrap';
 import { Navigate, Link } from 'react-router-dom';
 import { Heart, X } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/auth';
+import { useTheme } from '../context/theme';
 
 const favLink = (source: string, key: string) =>
   source === 'gbif' ? `/explore/${key}` : `/species/${key}`;

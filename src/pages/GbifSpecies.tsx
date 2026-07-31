@@ -1,11 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, ExternalLink, MapPin, Database } from 'lucide-react';
 import {
-  getSpecies, getDescription, getGallery, getOccurrenceCount, getCountries,
-  gbifOrgUrl, STATUS_LABEL, GbifError, type GbifTaxon,
+  getSpecies, getDescription, getGallery, getOccurrenceCount, getTopCountries, getRange,
+  gbifOrgUrl, STATUS_LABEL, GbifError, type GbifTaxon, type CountryStat, type RangeInfo,
 } from '../services/gbif';
 import FavoriteButton from '../components/FavoriteButton';
+
+// Heavy (world topojson + d3-geo) — only pulled in when a species detail renders.
+const ChoroplethMap = lazy(() => import('../components/ChoroplethMap'));
 
 const STATUS_CODE: Record<string, string> = {
   LEAST_CONCERN: 'LC', NEAR_THREATENED: 'NT', VULNERABLE: 'VU',
@@ -21,24 +24,36 @@ const GbifSpecies = () => {
   const [desc, setDesc] = useState<string | null>(null);
   const [gallery, setGallery] = useState<string[]>([]);
   const [count, setCount] = useState<number | null>(null);
-  const [countries, setCountries] = useState<string[]>([]);
+  const [countries, setCountries] = useState<CountryStat[]>([]);
+  const [range, setRange] = useState<RangeInfo | null>(null);
+  const [whereDone, setWhereDone] = useState(false); // both distribution calls settled
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let alive = true;
-    setLoading(true);
-    setError('');
+    queueMicrotask(() => {
+      if (alive) {
+        setLoading(true);
+        setError('');
+      }
+    });
     // Core detail first, then enrich (each best-effort).
     getSpecies(id)
       .then(t => { if (alive) setTaxon(t); })
       .catch(err => { if (alive) setError(err instanceof GbifError ? err.message : 'Could not load this species.'); })
       .finally(() => { if (alive) setLoading(false); });
 
+    queueMicrotask(() => { if (alive) setWhereDone(false); });
     getGallery(id).then(g => alive && setGallery(g)).catch(() => {});
     getDescription(id).then(d => alive && setDesc(d)).catch(() => {});
     getOccurrenceCount(id).then(c => alive && setCount(c)).catch(() => {});
-    getCountries(id).then(c => alive && setCountries(c)).catch(() => {});
+
+    // Both distribution sources must settle before we can say "no data".
+    Promise.allSettled([
+      getTopCountries(id, 250).then(c => alive && setCountries(c)),
+      getRange(id).then(r => alive && setRange(r)),
+    ]).finally(() => { if (alive) setWhereDone(true); });
 
     return () => { alive = false; };
   }, [id]);
@@ -90,9 +105,6 @@ const GbifSpecies = () => {
           {count !== null && (
             <span className="gbif-meta__item"><Database size={15} strokeWidth={2} /> {count.toLocaleString()} records</span>
           )}
-          {countries.length > 0 && (
-            <span className="gbif-meta__item"><MapPin size={15} strokeWidth={2} /> {countries.join(', ')}</span>
-          )}
           <a href={gbifOrgUrl(id)} target="_blank" rel="noreferrer" className="gbif-meta__link">
             View on GBIF <ExternalLink size={14} strokeWidth={2} />
           </a>
@@ -105,6 +117,68 @@ const GbifSpecies = () => {
         )}
 
         {desc && <p className="gbif-desc measure">{desc}</p>}
+
+        {(range?.native.length || range?.introduced.length || countries.length > 0) ? (
+          <div className="gbif-where">
+            <h2 className="section-sub" style={{ marginTop: 'var(--space-lg)' }}>
+              <MapPin size={18} strokeWidth={2} style={{ verticalAlign: '-3px' }} /> Where it's found
+            </h2>
+
+            {range && range.native.length > 0 && (
+              <div className="gbif-range">
+                <span className="gbif-range__label">Native range</span>
+                <div className="gbif-taxa">
+                  {range.native.map(r => <span key={r} className="chip chip--sm">{r}</span>)}
+                </div>
+              </div>
+            )}
+
+            {range && range.introduced.length > 0 && (
+              <div className="gbif-range">
+                <span className="gbif-range__label">Introduced</span>
+                <div className="gbif-taxa">
+                  {range.introduced.map(r => <span key={r} className="chip chip--sm chip--muted">{r}</span>)}
+                </div>
+              </div>
+            )}
+
+            {countries.length > 0 && (
+              <div className="gbif-range">
+                <span className="gbif-range__label">Occurrence map · {countries.length} countries</span>
+                <Suspense fallback={<div className="choropleth choropleth--loading" aria-hidden="true" />}>
+                  <ChoroplethMap data={countries} />
+                </Suspense>
+              </div>
+            )}
+
+            {countries.length > 0 && (
+              <div className="gbif-range">
+                <span className="gbif-range__label">Most records by country</span>
+                <ul className="gbif-bars">
+                  {countries.slice(0, 8).map(c => (
+                    <li key={c.code} className="gbif-bar">
+                      <span className="gbif-bar__name">{c.name}</span>
+                      <span className="gbif-bar__track">
+                        <span
+                          className="gbif-bar__fill"
+                          style={{ width: `${Math.max(4, (c.count / countries[0].count) * 100)}%` }}
+                        />
+                      </span>
+                      <span className="gbif-bar__count">{c.count.toLocaleString()}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        ) : whereDone ? (
+          <div className="gbif-where">
+            <h2 className="section-sub" style={{ marginTop: 'var(--space-lg)' }}>
+              <MapPin size={18} strokeWidth={2} style={{ verticalAlign: '-3px' }} /> Where it's found
+            </h2>
+            <p className="empty-note" style={{ margin: 0 }}>Distribution data isn't available for this species yet.</p>
+          </div>
+        ) : null}
 
         {gallery.length > 1 && (
           <>

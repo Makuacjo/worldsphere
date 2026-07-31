@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles, Users, Compass } from 'lucide-react';
 import Hero from '../components/Hero';
@@ -10,15 +10,20 @@ import { allWildlife, animalData, plantData, waterData } from '../data';
 
 const InteractiveGlobe = lazy(() => import('../components/InteractiveGlobe'));
 
-const REGIONS = ['Africa', 'Asia', 'Europe', 'North America', 'South America', 'Oceania'];
+const REGIONS = [
+  { name: 'Africa', image: 'https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=1200&q=84', alt: 'Elephants crossing an African savannah' },
+  { name: 'Asia', image: 'https://images.unsplash.com/photo-1528360983277-13d401cdc186?auto=format&fit=crop&w=1200&q=84', alt: 'Mountain landscape and temple scenery in Asia' },
+  { name: 'Europe', image: 'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1200&q=84', alt: 'Alpine lake and mountain village in Europe' },
+  { name: 'North America', image: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=84', alt: 'Wild mountain landscape in North America' },
+  { name: 'South America', image: 'https://images.unsplash.com/photo-1526392060635-9d6019884377?auto=format&fit=crop&w=1200&q=84', alt: 'Machu Picchu among green Andean mountains' },
+  { name: 'Oceania', image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=84', alt: 'Turquoise ocean and bright coast in Oceania' },
+];
 
 const featured = allWildlife.filter(e => e.isFeatured).slice(0, 6);
 
 const Stat = ({ value, label }: { value: number; label: string }) => {
   // Animate from 0 on mount.
-  const [target, setTarget] = useState(0);
-  useEffect(() => { setTarget(value); }, [value]);
-  const shown = useCountUp(target);
+  const shown = useCountUp(value);
   return (
     <div className="stat-strip__item">
       <span className="stat-strip__value">{shown}</span>
@@ -90,10 +95,15 @@ const Home = () => {
           </Reveal>
           <div className="region-grid">
             {REGIONS.map((region, i) => (
-              <Reveal key={region} delay={(i % 3) * 0.06}>
-                <Link to={`/stories?region=${encodeURIComponent(region)}`} className="region-card">
-                  <span className="region-card__name">{region}</span>
-                  <span className="region-card__go"><ArrowRight size={16} strokeWidth={2} /></span>
+              <Reveal key={region.name} delay={(i % 3) * 0.06}>
+                <Link to={`/stories?region=${encodeURIComponent(region.name)}`} className="region-card">
+                  <img className="region-card__image" src={region.image} alt={region.alt} loading="lazy" />
+                  <span className="region-card__shade" aria-hidden="true" />
+                  <span className="region-card__content">
+                    <small>Explore biodiversity</small>
+                    <strong className="region-card__name">{region.name}</strong>
+                  </span>
+                  <span className="region-card__go" aria-hidden="true"><ArrowRight size={18} strokeWidth={2} /></span>
                 </Link>
               </Reveal>
             ))}

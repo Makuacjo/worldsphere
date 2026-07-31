@@ -1,7 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { Container } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { Compass, Play } from 'lucide-react';
 import { useMagnetic } from '../hooks/useMagnetic';
 
@@ -15,15 +15,66 @@ const container = {
 };
 
 const item = {
-  hidden: { opacity: 0, y: 26, filter: 'blur(8px)' },
+  hidden: { opacity: 0, y: 20 },
   show: {
     opacity: 1,
     y: 0,
-    filter: 'blur(0px)',
     transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] },
   },
 };
 
+const HEADLINE = [
+  { text: 'Explore', emphasis: false },
+  { text: 'the', emphasis: false },
+  { text: 'Planet.', emphasis: true },
+];
+
+const ExplodingHeadline = () => {
+  const reduceMotion = useReducedMotion();
+  let characterIndex = 0;
+
+  return (
+    <motion.h1 className="hero__title hero__title--animated" variants={item} aria-label="Explore the Planet.">
+      {HEADLINE.map((word, wordIndex) => {
+        const Word = word.emphasis ? 'em' : 'span';
+        return (
+          <Word className="hero__word" key={word.text} aria-hidden="true">
+            {Array.from(word.text).map((character) => {
+              const index = characterIndex++;
+              const direction = index % 2 === 0 ? -1 : 1;
+              const x = ((index % 5) - 2) * 18;
+              const y = ((index % 3) - 1) * 24;
+              return (
+                <motion.span
+                  className="hero__letter"
+                  key={`${word.text}-${index}`}
+                  animate={reduceMotion ? { opacity: 1 } : {
+                    opacity: [1, 1, 0.18, 1],
+                    x: [0, 0, x, 0],
+                    y: [0, 0, y, 0],
+                    rotate: [0, 0, direction * (7 + index % 4 * 3), 0],
+                    scale: [1, 1, 1.12, 1],
+                  }}
+                  transition={reduceMotion ? { duration: 0 } : {
+                    duration: 3.2,
+                    times: [0, 0.55, 0.76, 1],
+                    delay: index * 0.018,
+                    repeat: Infinity,
+                    repeatDelay: 0.7,
+                    ease: [0.34, 1.2, 0.64, 1],
+                  }}
+                >
+                  {character}
+                </motion.span>
+              );
+            })}
+            {wordIndex < HEADLINE.length - 1 && <span className="hero__word-space"> </span>}
+          </Word>
+        );
+      })}
+    </motion.h1>
+  );
+};
 const Hero = () => {
   const magPrimary = useMagnetic<HTMLAnchorElement>();
   const magGhost = useMagnetic<HTMLAnchorElement>(0.25);
@@ -36,11 +87,11 @@ const Hero = () => {
 
       <Container>
         <motion.div className="hero__inner" variants={container} initial="hidden" animate="show">
-          <motion.p className="kicker hero__kicker mb-3" variants={item}>WORLDSPHERE</motion.p>
+          <motion.div className="hero__kicker mb-3" variants={item}>
+            <img src="/WorldSphere-Logo-Package/WorldSphere-Logo.png" alt="WorldSphere" />
+          </motion.div>
 
-          <motion.h1 className="hero__title" variants={item}>
-            Explore the <em>Planet.</em>
-          </motion.h1>
+          <ExplodingHeadline />
 
           <motion.p className="hero__lede" variants={item}>
             Discover knowledge. Connect humanity. A living atlas of Earth's

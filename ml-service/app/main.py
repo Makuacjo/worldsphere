@@ -6,51 +6,71 @@ Run from the ml-service directory:
 """
 from __future__ import annotations
 
-import sqlite3
+from contextlib import asynccontextmanager
+import psycopg
 
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.schemas import (
     PredictionRequest, PredictionResponse, InsightsResponse,
     SignupRequest, LoginRequest, AuthResponse, UserOut, FavoriteIn, FavoriteOut,
 )
 from app.service import Model
-from app import ai, db, auth
+from app import ai, db, auth, account
+from app.ai_core.router import router as shared_ai_router
+from app.ai_core import rate_limit as ai_rate_limit
+from app.config import parse_cors_origins, validate_auth_secret
+from app.login_rate_limit import enforce as enforce_auth_rate_limit
 
-app = FastAPI(title="WorldSphere Conservation Insights API", version="1.0.0")
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    validate_auth_secret()
+    db.init()
+    yield
+
+app = FastAPI(title="WorldSphere Conservation Insights API", version="1.0.0",
+              lifespan=lifespan)
 
 # Allow the Vite dev server (and preview) to call the API from the browser.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "http://localhost:4173",
-    ],
+    allow_origins=parse_cors_origins(),
     allow_methods=["*"],
-    allow_headers=["*"],
+    allow_headers=["Authorization", "Content-Type", "X-WorldSphere-Session"],
+    expose_headers=["X-Conversation-Id", "X-Assistant-Type"],
 )
 
 model = Model()
-db.init()
+app.include_router(shared_ai_router)
+app.include_router(account.router)
 
 _NOT_TRAINED = "Model not trained yet. Run: python model/train.py"
 
 
 @app.get("/health")
-def health() -> dict:
-    return {"status": "ok", "model_ready": model.ready, "ai_ready": ai.available()}
+def health(response: Response) -> dict:
+    database_ready = db.ready()
+    model_ready = model.ready
+    if not database_ready or not model_ready:
+        response.status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+    return {
+        "status": "ok" if database_ready and model_ready else "degraded",
+        "application_ready": True,
+        "model_ready": model_ready,
+        "database_ready": database_ready,
+        "ai_ready": ai.available(),
+    }
 
 
 class AskRequest(BaseModel):
-    question: str
+    question: str = Field(min_length=1, max_length=4000)
 
 
 @app.post("/ai/ask")
-def ai_ask(req: AskRequest) -> StreamingResponse:
+def ai_ask(req: AskRequest, request: Request) -> StreamingResponse:
     if not ai.available():
         raise HTTPException(
             status_code=503,
@@ -59,6 +79,11 @@ def ai_ask(req: AskRequest) -> StreamingResponse:
     question = req.question.strip()
     if not question:
         raise HTTPException(status_code=400, detail="Ask a question first.")
+    address = request.client.host if request.client else "unknown"
+    try:
+        ai_rate_limit.check(f"legacy:{address}")
+    except ai_rate_limit.RateLimitError as exc:
+        raise HTTPException(status_code=429, detail=str(exc)) from exc
     return StreamingResponse(ai.stream_answer(question), media_type="text/plain; charset=utf-8")
 
 
@@ -79,8 +104,9 @@ def insights() -> dict:
 # ------------------------------------------------------------------- auth ---
 
 @app.post("/auth/signup", response_model=AuthResponse)
-def signup(req: SignupRequest) -> dict:
-    name, email, password = req.name.strip(), req.email.strip().lower(), req.password
+def signup(req: SignupRequest, request: Request) -> dict:
+    enforce_auth_rate_limit(request)
+    name, email, password = req.name.strip(), req.email.strip().casefold(), req.password
     if not name or "@" not in email:
         raise HTTPException(status_code=400, detail="Enter a name and a valid email.")
     if len(password) < 8:
@@ -88,20 +114,21 @@ def signup(req: SignupRequest) -> dict:
     with db.connect() as conn:
         try:
             cur = conn.execute(
-                "INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)",
+                "INSERT INTO users (name, email, password_hash) VALUES (%s, %s, %s) RETURNING id",
                 (name, email, auth.hash_password(password)),
             )
-        except sqlite3.IntegrityError:
+            uid = cur.fetchone()["id"]
+        except psycopg.errors.UniqueViolation:
             raise HTTPException(status_code=409, detail="An account with that email already exists.")
-        uid = cur.lastrowid
     return {"token": auth.create_token(uid, email), "user": {"id": uid, "name": name, "email": email}}
 
 
 @app.post("/auth/login", response_model=AuthResponse)
-def login(req: LoginRequest) -> dict:
-    email = req.email.strip().lower()
+def login(req: LoginRequest, request: Request) -> dict:
+    enforce_auth_rate_limit(request)
+    email = req.email.strip().casefold()
     with db.connect() as conn:
-        row = conn.execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()
+        row = conn.execute("SELECT * FROM users WHERE email = %s", (email,)).fetchone()
     if not row or not auth.verify_password(req.password, row["password_hash"]):
         raise HTTPException(status_code=401, detail="Incorrect email or password.")
     user = {"id": row["id"], "name": row["name"], "email": row["email"]}
@@ -120,7 +147,7 @@ def list_favorites(user: dict = Depends(auth.current_user)) -> list[dict]:
     with db.connect() as conn:
         rows = conn.execute(
             "SELECT id, key, source, name, scientific_name, image FROM favorites "
-            "WHERE user_id = ? ORDER BY created_at DESC",
+            "WHERE user_id = %s ORDER BY created_at DESC",
             (user["id"],),
         ).fetchall()
     return [
@@ -134,15 +161,16 @@ def list_favorites(user: dict = Depends(auth.current_user)) -> list[dict]:
 def add_favorite(fav: FavoriteIn, user: dict = Depends(auth.current_user)) -> dict:
     with db.connect() as conn:
         conn.execute(
-            "INSERT OR IGNORE INTO favorites (user_id, key, source, name, scientific_name, image) "
-            "VALUES (?, ?, ?, ?, ?, ?)",
+            "INSERT INTO favorites (user_id, key, source, name, scientific_name, image) "
+            "VALUES (%s, %s, %s, %s, %s, %s) ON CONFLICT (user_id, source, key) DO NOTHING",
             (user["id"], fav.key, fav.source, fav.name, fav.scientificName, fav.image),
         )
         row = conn.execute(
             "SELECT id, key, source, name, scientific_name, image FROM favorites "
-            "WHERE user_id = ? AND source = ? AND key = ?",
+            "WHERE user_id = %s AND source = %s AND key = %s",
             (user["id"], fav.source, fav.key),
         ).fetchone()
+    account.activity(user["id"], "favorite_added", row["name"], row["source"], row["key"])
     return {"id": row["id"], "key": row["key"], "source": row["source"], "name": row["name"],
             "scientificName": row["scientific_name"], "image": row["image"]}
 
@@ -151,7 +179,8 @@ def add_favorite(fav: FavoriteIn, user: dict = Depends(auth.current_user)) -> di
 def remove_favorite(source: str, key: str, user: dict = Depends(auth.current_user)) -> dict:
     with db.connect() as conn:
         conn.execute(
-            "DELETE FROM favorites WHERE user_id = ? AND source = ? AND key = ?",
+            "DELETE FROM favorites WHERE user_id = %s AND source = %s AND key = %s",
             (user["id"], source, key),
         )
+    account.activity(user["id"], "favorite_removed", f"Removed {source} favorite", source, key)
     return {"ok": True}

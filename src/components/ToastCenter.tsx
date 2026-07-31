@@ -1,0 +1,6 @@
+import { useEffect, useState } from 'react';
+import { CheckCircle2, AlertCircle, X } from 'lucide-react';
+
+type Notice = { id:number; type:'success'|'error'; message:string };
+const ToastCenter=()=>{const [items,setItems]=useState<Notice[]>([]);useEffect(()=>{const onNotice=(event:Event)=>{const detail=(event as CustomEvent).detail;const item={id:Date.now(),...detail};setItems(current=>[...current,item]);window.setTimeout(()=>setItems(current=>current.filter(x=>x.id!==item.id)),4200)};window.addEventListener('worldsphere:notice',onNotice);return()=>window.removeEventListener('worldsphere:notice',onNotice)},[]);return <div className="toast-center" aria-live="polite">{items.map(item=><div key={item.id} className={`app-toast app-toast--${item.type}`} role={item.type==='error'?'alert':'status'}>{item.type==='success'?<CheckCircle2 size={18}/>:<AlertCircle size={18}/>}<span>{item.message}</span><button onClick={()=>setItems(current=>current.filter(x=>x.id!==item.id))} aria-label="Dismiss notification"><X size={16}/></button></div>)}</div>};
+export default ToastCenter;

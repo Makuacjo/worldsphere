@@ -31,7 +31,7 @@ def build_pipeline() -> Pipeline:
         [("cat", OneHotEncoder(handle_unknown="ignore"), C.CATEGORICAL)],
         remainder="passthrough",
     )
-    clf = RandomForestClassifier(n_estimators=250, random_state=42, n_jobs=-1)
+    clf = RandomForestClassifier(n_estimators=250, random_state=42, n_jobs=1)
     return Pipeline([("pre", pre), ("clf", clf)])
 
 

@@ -1,0 +1,231 @@
+.risk-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.risk-panel {
+  min-width: 0;
+  border-radius: 14px;
+  background: var(--bg-elev);
+  box-shadow: 0 5px 8px rgba(34, 40, 49, .1);
+}
+
+.risk-panel--form {
+  padding: clamp(1.25rem, 3vw, 2rem);
+}
+
+.risk-panel--result {
+  display: flex;
+  min-height: 470px;
+  flex-direction: column;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  background:
+    radial-gradient(circle at 88% 10%, color-mix(in oklab, var(--secondary-color) 12%, transparent), transparent 34%),
+    var(--bg-elev);
+}
+
+.risk-panel__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.risk-panel__head h3 {
+  margin: .2rem 0 0;
+  color: var(--ink-strong);
+  font-size: 1.25rem;
+}
+
+.risk-panel__head p {
+  max-width: 48ch;
+  margin: .35rem 0 0;
+  color: var(--ink-dim);
+  font-size: .76rem;
+}
+
+.risk-panel__icon {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  flex: none;
+  place-items: center;
+  border-radius: 10px;
+  color: var(--secondary-color);
+  background: color-mix(in oklab, var(--secondary-color) 12%, var(--bg-elev-2));
+}
+
+.risk-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .9rem;
+}
+
+.risk-field {
+  margin: 0;
+}
+
+.risk-field .form-label {
+  margin-bottom: .35rem;
+  color: var(--ink);
+  font-size: .72rem;
+  font-weight: 600;
+}
+
+.risk-field .form-control,
+.risk-field .form-select {
+  min-height: 46px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--ink-strong);
+  background-color: var(--bg);
+  font-size: .82rem;
+}
+
+.risk-field .form-control:focus,
+.risk-field .form-select:focus {
+  border-color: var(--secondary-color);
+  background-color: var(--bg);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--secondary-color) 18%, transparent);
+}
+
+.risk-submit {
+  display: flex;
+  width: 100%;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  margin-top: 1.25rem;
+  border: 0;
+  border-radius: 8px;
+  color: #fff;
+  background: #f85959;
+  font: inherit;
+  font-size: .82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 180ms ease-out, background 180ms ease-out;
+}
+
+.risk-submit:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: #e94f4f;
+}
+
+.risk-submit:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.risk-submit:disabled {
+  opacity: .65;
+  cursor: wait;
+}
+
+.risk-empty {
+  display: grid;
+  max-width: 460px;
+  flex: 1;
+  align-content: center;
+  justify-items: start;
+  margin: auto;
+  padding: 1rem;
+}
+
+.risk-empty__mark {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  place-items: center;
+  margin-bottom: 1.25rem;
+  border-radius: 14px;
+  color: #f85959;
+  background: color-mix(in oklab, #f85959 12%, var(--bg-elev-2));
+}
+
+.risk-empty h4 {
+  margin: 0;
+  color: var(--ink-strong);
+  font-size: 1.35rem;
+}
+
+.risk-empty > p {
+  margin: .55rem 0 1.25rem;
+  color: var(--ink-dim);
+  font-size: .82rem;
+}
+
+.risk-empty ul {
+  display: grid;
+  gap: .6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--ink);
+  font-size: .76rem;
+}
+
+.risk-empty li {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+.risk-empty li svg {
+  color: var(--secondary-color);
+}
+
+.risk-error {
+  margin: auto 0;
+  border: 0;
+  border-radius: 10px;
+  color: var(--ink);
+  background: color-mix(in oklab, #f85959 10%, var(--bg-elev-2));
+}
+
+.risk-result__summary {
+  display: flex;
+  align-items: center;
+  gap: .8rem;
+  margin-bottom: 1.5rem;
+}
+
+.risk-result__badge {
+  padding: .5rem .75rem;
+  border-radius: 7px;
+  color: #fff;
+  font-size: .78rem;
+  font-weight: 750;
+}
+
+.risk-result__summary strong {
+  color: var(--ink-strong);
+}
+
+.risk-chart {
+  min-height: 260px;
+  flex: 1;
+}
+
+@media (max-width: 900px) {
+  .risk-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .risk-panel--result {
+    min-height: 390px;
+  }
+}
+
+@media (max-width: 560px) {
+  .risk-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .risk-panel--result {
+    min-height: 360px;
+  }
+}

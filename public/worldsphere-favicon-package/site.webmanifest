@@ -1,0 +1,19 @@
+{
+  "name": "WorldSphere",
+  "short_name": "WorldSphere",
+  "icons": [
+    {
+      "src": "/worldsphere-favicon-package/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/worldsphere-favicon-package/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#0F4C81",
+  "background_color": "#ffffff",
+  "display": "standalone"
+}

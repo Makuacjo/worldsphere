@@ -13,7 +13,7 @@ const Footer = () => {
         <Row className="gy-4">
           {/* Brand & Mission */}
           <Col lg={4}>
-            <h4 className="fw-bold mb-3" style={{ letterSpacing: '1px' }}>WORLDSPHERE</h4>
+            <img className="footer__brand-logo mb-3" src="/WorldSphere-Logo-Package/WorldSphere-Logo.png" alt="WorldSphere" />
             <p style={{ opacity: 0.8, fontSize: '0.95rem', lineHeight: '1.7' }}>
               A digital sanctuary dedicated to documenting the Earth's biodiversity. 
               Our mission is to foster conservation through education and research 
@@ -118,7 +118,7 @@ const Footer = () => {
               <div 
                 className="p-3 text-center animate-fade-in" 
                 style={{ 
-                  backgroundColor: 'rgba(78, 106, 91, 0.2)', 
+                  backgroundColor: 'rgba(46, 189, 196, 0.14)',
                   border: '1px solid var(--secondary-color)', 
                   borderRadius: '6px' 
                 }}

@@ -1,8 +1,8 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { Container, Row, Col, Form, Button, InputGroup, Spinner } from 'react-bootstrap';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/auth';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -14,6 +14,7 @@ interface Touched {
 const Login = () => {
     const { login, isAuthenticated } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -44,7 +45,9 @@ const Login = () => {
         setSubmitting(true);
         try {
             await login(email.trim(), password);
-            navigate('/profile');
+            const requested = (location.state as { from?: string } | null)?.from || sessionStorage.getItem('worldsphere_auth_return');
+            sessionStorage.removeItem('worldsphere_auth_return');
+            navigate(requested || '/profile', { replace: true });
         } catch (err) {
             setServerError(err instanceof Error ? err.message : 'Could not sign in.');
         } finally {

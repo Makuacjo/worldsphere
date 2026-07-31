@@ -1,9 +1,8 @@
-__pycache__/
-*.pyc
+.env
 .venv/
-venv/
-artifacts/*.joblib
-artifacts/*.csv
-artifacts/*.json
-artifacts/*.db
-artifacts/auth_secret
+__pycache__/
+*.py[cod]
+artifacts/
+*.db
+*.sqlite
+*.sqlite3

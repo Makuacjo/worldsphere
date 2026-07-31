@@ -6,6 +6,8 @@ import {
   Sparkles, ArrowRight, ShieldAlert, Leaf, Globe2, LineChart, Compass, FlaskConical, Loader2,
 } from 'lucide-react';
 import RiskPredictorPanel from '../components/RiskPredictorPanel';
+import AssistantLauncher from '../components/ai/AssistantLauncher';
+import '../components/ai/assistant.css';
 import { askStream, AiError } from '../services/ai';
 
 const SUGGESTED_QUESTIONS = [
@@ -74,12 +76,14 @@ const AIExplorer = () => {
       <div className="container">
         <header className="ai-head">
           <p className="kicker">AI Explorer</p>
-          <h1 className="ai-title">Ask the planet</h1>
+          <h1 className="ai-title">Ask the planet.</h1>
           <p className="ai-lede measure">
-            A conversation with a field naturalist, powered by Claude. Ask about
+            A conversation with a field naturalist, powered through OpenRouter. Ask about
             any species, habitat, or conservation question — then dive into the
             model to predict a species' future.
           </p>
+
+          <AssistantLauncher />
 
           <form className="ai-ask" onSubmit={onSubmit} role="search">
             <Sparkles size={20} strokeWidth={1.75} className="ai-ask__icon" />

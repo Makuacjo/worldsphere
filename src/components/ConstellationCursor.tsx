@@ -101,12 +101,12 @@ const ConstellationCursor = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent-bright') || '#8FB2A9';
+    const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent-bright') || '#2EBDC4';
     const line1 = hexToRGBA(accent, 1);
     const dot = hexToRGBA(accent, 0.9);
 
     let w = 0, h = 0;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.25);
     let particles: P[] = [];
     const shapes = makeShapes(72);
 
@@ -118,7 +118,7 @@ const ConstellationCursor = () => {
       canvas.style.width = w + 'px';
       canvas.style.height = h + 'px';
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const count = Math.min(120, Math.round((w * h) / 14000));
+      const count = Math.min(72, Math.round((w * h) / 22000));
       particles = Array.from({ length: count }, () => ({
         x: Math.random() * w,
         y: Math.random() * h,
@@ -147,9 +147,16 @@ const ConstellationCursor = () => {
     const MOUSE_LINK = 190;
     let raf = 0;
     let running = true;
+    let lastFrame = 0;
+    const frameInterval = 1000 / 30;
 
-    const frame = () => {
+    const frame = (now = performance.now()) => {
       if (!running) return;
+      if (now - lastFrame < frameInterval) {
+        raf = requestAnimationFrame(frame);
+        return;
+      }
+      lastFrame = now;
       ctx.clearRect(0, 0, w, h);
 
       const shape = shapeKey ? shapes[shapeKey] : null;

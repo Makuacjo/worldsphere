@@ -27,9 +27,7 @@ const recordToChartData = (record: Record<string, number>): { name: string; coun
 
 // Animates from 0 to the target once on mount (and on any later change).
 const StatNumber = ({ value }: { value: number }) => {
-    const [target, setTarget] = useState(0);
-    useEffect(() => { setTarget(value); }, [value]);
-    const v = useCountUp(target);
+    const v = useCountUp(value);
     return <>{v.toLocaleString()}</>;
 };
 

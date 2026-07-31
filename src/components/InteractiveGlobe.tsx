@@ -196,7 +196,7 @@ const InteractiveGlobe = ({ interactive = true }: Props) => {
     try {
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     } catch {
-      setFailed(true);
+      queueMicrotask(() => setFailed(true));
       return;
     }
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
@@ -215,10 +215,10 @@ const InteractiveGlobe = ({ interactive = true }: Props) => {
       fragmentShader: EARTH_FRAG,
       uniforms: {
         uTime: { value: 0 },
-        uOcean: { value: new THREE.Vector3(...cssColor('--ocean', '#394C59')) },
-        uLand: { value: new THREE.Vector3(...cssColor('--forest', '#4A6B3A')) },
-        uLandHi: { value: new THREE.Vector3(...cssColor('--teal', '#6B8487')) },
-        uAtmos: { value: new THREE.Vector3(...cssColor('--cloud', '#B6C1D3')) },
+        uOcean: { value: new THREE.Vector3(...cssColor('--ocean', '#222831')) },
+        uLand: { value: new THREE.Vector3(...cssColor('--forest', '#68E5B2')) },
+        uLandHi: { value: new THREE.Vector3(...cssColor('--teal', '#2EBDC4')) },
+        uAtmos: { value: new THREE.Vector3(...cssColor('--cloud', '#DEE2E6')) },
       },
     });
     const earth = new THREE.Mesh(new THREE.SphereGeometry(R, 96, 96), earthMat);
@@ -228,7 +228,7 @@ const InteractiveGlobe = ({ interactive = true }: Props) => {
     const atmoMat = new THREE.ShaderMaterial({
       vertexShader: ATMO_VERT,
       fragmentShader: ATMO_FRAG,
-      uniforms: { uColor: { value: new THREE.Vector3(...cssColor('--cloud', '#B6C1D3')) } },
+      uniforms: { uColor: { value: new THREE.Vector3(...cssColor('--cloud', '#DEE2E6')) } },
       side: THREE.BackSide,
       blending: THREE.AdditiveBlending,
       transparent: true,
@@ -255,7 +255,7 @@ const InteractiveGlobe = ({ interactive = true }: Props) => {
     // Region markers
     const markerGroup = new THREE.Group();
     const markerGeo = new THREE.SphereGeometry(0.045, 16, 16);
-    const markerColor = new THREE.Color().setRGB(...cssColor('--accent-bright', '#8FB2A9'));
+    const markerColor = new THREE.Color().setRGB(...cssColor('--accent-bright', '#2EBDC4'));
     REGIONS.forEach(region => {
       const pos = latLonToVec3(region.lat, region.lon, R * 1.02);
       const marker = new THREE.Mesh(

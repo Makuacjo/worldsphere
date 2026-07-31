@@ -1,10 +1,11 @@
-import { lazy, Suspense } from 'react';
-import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
+import { lazy, Suspense, useLayoutEffect } from 'react';
+import { createBrowserRouter, RouterProvider, Outlet, useLocation } from 'react-router-dom';
 import { MotionConfig } from 'framer-motion';
 import { Spinner } from 'react-bootstrap';
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import ConstellationCursor from './components/ConstellationCursor';
+import ToastCenter from './components/ToastCenter';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 
@@ -31,8 +32,15 @@ const Dashboard = lazy(() => import('./pages/Dashboard'));
 const RiskPredictor = lazy(() => import('./pages/RiskPredictor'));
 const Login = lazy(() => import('./pages/Login'));
 const Signup = lazy(() => import('./pages/Signup'));
-const Profile = lazy(() => import('./pages/Profile'));
+const Profile = lazy(() => import('./pages/AccountDashboard'));
 const NotFound = lazy(() => import('./pages/NotFound'));
+const Tourism = lazy(() => import('./pages/Tourism'));
+const TourismGuide = lazy(() => import('./pages/TourismGuide'));
+const DestinationDetail = lazy(() => import('./pages/DestinationDetail'));
+const NairobiAttractionDetail = lazy(() => import('./pages/NairobiAttractionDetail'));
+const SpeciesAI = lazy(() => import('./pages/SpeciesAI'));
+const TourGuideAI = lazy(() => import('./pages/TourGuideAI'));
+const RouteError = lazy(() => import('./pages/RouteError'));
 
 const PageFallback = () => (
   <div style={{ minHeight: '70vh', display: 'grid', placeItems: 'center' }}>
@@ -40,11 +48,44 @@ const PageFallback = () => (
   </div>
 );
 
+const RouteScrollManager = () => {
+  const { pathname, hash } = useLocation();
+
+  useLayoutEffect(() => {
+    const previousRestoration = window.history.scrollRestoration;
+    window.history.scrollRestoration = 'manual';
+
+    if (hash) {
+      const frame = window.requestAnimationFrame(() => {
+        document.getElementById(decodeURIComponent(hash.slice(1)))?.scrollIntoView({
+          block: 'start',
+        });
+      });
+
+      return () => {
+        window.cancelAnimationFrame(frame);
+        window.history.scrollRestoration = previousRestoration;
+      };
+    }
+
+    const previousScrollBehavior = document.documentElement.style.scrollBehavior;
+    document.documentElement.style.scrollBehavior = 'auto';
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    document.documentElement.style.scrollBehavior = previousScrollBehavior;
+
+    return () => {
+      window.history.scrollRestoration = previousRestoration;
+    };
+  }, [pathname, hash]);
+
+  return null;
+};
 // Shared shell: persistent Navbar/Footer with the routed page in between.
 // A data router (createBrowserRouter) is required for View Transitions —
 // Link viewTransition / useViewTransitionState only work under it.
 const Layout = () => (
   <>
+    <RouteScrollManager />
     <a href="#main-content" className="skip-link">Skip to content</a>
     <Navbar />
     <div id="main-content">
@@ -53,6 +94,7 @@ const Layout = () => (
       </Suspense>
     </div>
     <Footer />
+    <ToastCenter />
   </>
 );
 
@@ -60,6 +102,7 @@ const router = createBrowserRouter([
   {
     path: '/',
     element: <Layout />,
+    errorElement: <RouteError />,
     children: [
       { index: true, element: <Home /> },
 
@@ -72,6 +115,12 @@ const router = createBrowserRouter([
       { path: 'communities', element: <Communities /> },
       { path: 'expeditions', element: <Expeditions /> },
       { path: 'ai', element: <AIExplorer /> },
+      { path: 'ai/species', element: <SpeciesAI /> },
+      { path: 'ai/tour-guide', element: <TourGuideAI /> },
+      { path: 'tourism', element: <Tourism /> },
+      { path: 'tourism/guides/:slug', element: <TourismGuide /> },
+      { path: 'destinations/:slug', element: <DestinationDetail /> },
+      { path: 'destinations/:destinationSlug/attractions/:attractionSlug', element: <NairobiAttractionDetail /> },
 
       // Category pages (kept; reframed as Stories in a later phase)
       { path: 'animals', element: <Animals /> },

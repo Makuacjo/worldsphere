@@ -45,7 +45,7 @@ float fbm(vec2 p) {
   float v = 0.0;
   float amp = 0.5;
   mat2 m = mat2(1.6, 1.2, -1.2, 1.6);
-  for (int i = 0; i < 5; i++) {
+  for (int i = 0; i < 4; i++) {
     v += amp * noise(p);
     p = m * p;
     amp *= 0.5;
@@ -107,9 +107,9 @@ const hexToRGB = (hex: string): [number, number, number] => {
 const readThemeColors = (el: HTMLElement) => {
   const cs = getComputedStyle(el);
   return {
-    a: hexToRGB(cs.getPropertyValue('--foundation-color') || '#283B28'),
-    b: hexToRGB(cs.getPropertyValue('--secondary-color') || '#4E6A5B'),
-    c: hexToRGB(cs.getPropertyValue('--highlight-color') || '#A68D4A'),
+    a: hexToRGB(cs.getPropertyValue('--foundation-color') || '#222831'),
+    b: hexToRGB(cs.getPropertyValue('--secondary-color') || '#2EBDC4'),
+    c: hexToRGB(cs.getPropertyValue('--highlight-color') || '#68E5B2'),
   };
 };
 
@@ -127,7 +127,7 @@ const ShaderBackground = () => {
       renderer = new Renderer({
         alpha: false,
         antialias: false,
-        dpr: Math.min(window.devicePixelRatio || 1, 1.5),
+        dpr: 1,
         powerPreference: 'high-performance',
       });
     } catch {
@@ -195,6 +195,13 @@ const ShaderBackground = () => {
 
     let raf = 0;
     let running = true;
+    let inView = true;
+    let lastFrame = 0;
+    const frameInterval = 1000 / 30;
+    const visibilityObserver = new IntersectionObserver(([entry]) => {
+      inView = entry?.isIntersecting ?? true;
+    });
+    visibilityObserver.observe(container);
 
     if (reduceMotion) {
       // One static, on-brand frame. No animation loop.
@@ -203,12 +210,14 @@ const ShaderBackground = () => {
       const start = performance.now();
       const loop = (now: number) => {
         if (!running) return;
+        raf = requestAnimationFrame(loop);
+        if (!inView || now - lastFrame < frameInterval) return;
+        lastFrame = now;
         current.x += (target.x - current.x) * 0.04;
         current.y += (target.y - current.y) * 0.04;
         program.uniforms.uMouse.value.set(current.x, current.y);
         program.uniforms.uTime.value = (now - start) / 1000;
         renderer.render({ scene: mesh });
-        raf = requestAnimationFrame(loop);
       };
       raf = requestAnimationFrame(loop);
 
@@ -230,6 +239,7 @@ const ShaderBackground = () => {
         window.removeEventListener('resize', resize);
         window.removeEventListener('pointermove', onPointer);
         document.removeEventListener('visibilitychange', onVisibility);
+        visibilityObserver.disconnect();
         themeObserver.disconnect();
         gl.canvas.remove();
         gl.getExtension('WEBGL_lose_context')?.loseContext();
@@ -241,6 +251,7 @@ const ShaderBackground = () => {
       cancelAnimationFrame(raf);
       window.removeEventListener('resize', resize);
       window.removeEventListener('pointermove', onPointer);
+      visibilityObserver.disconnect();
       themeObserver.disconnect();
       gl.canvas.remove();
       gl.getExtension('WEBGL_lose_context')?.loseContext();

@@ -1,6 +1,8 @@
 """Pydantic schemas — mirror the TypeScript contract in src/services/conservationApi.ts."""
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic import BaseModel, Field, ConfigDict
 
 
@@ -53,14 +55,14 @@ class InsightsResponse(BaseModel):
 # ---- auth + favorites ----------------------------------------------------
 
 class SignupRequest(BaseModel):
-    name: str
-    email: str
-    password: str
+    name: str = Field(min_length=1, max_length=100)
+    email: str = Field(min_length=3, max_length=254)
+    password: str = Field(min_length=8, max_length=128)
 
 
 class LoginRequest(BaseModel):
-    email: str
-    password: str
+    email: str = Field(min_length=3, max_length=254)
+    password: str = Field(min_length=1, max_length=128)
 
 
 class UserOut(BaseModel):
@@ -75,11 +77,11 @@ class AuthResponse(BaseModel):
 
 
 class FavoriteIn(BaseModel):
-    key: str
-    source: str  # 'gbif' | 'catalog'
-    name: str
-    scientificName: str | None = None
-    image: str | None = None
+    key: str = Field(min_length=1, max_length=255)
+    source: Literal["gbif", "catalog", "destination", "attraction", "trip", "trip_plan"]
+    name: str = Field(min_length=1, max_length=300)
+    scientificName: str | None = Field(default=None, max_length=300)
+    image: str | None = Field(default=None, max_length=2048)
 
 
 class FavoriteOut(FavoriteIn):

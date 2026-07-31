@@ -16,8 +16,8 @@ export const useCountUp = (target: number, duration = 550) => {
 
     if (from === to) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setValue(to);
-      return;
+      const frame = requestAnimationFrame(() => setValue(to));
+      return () => cancelAnimationFrame(frame);
     }
 
     let raf = 0;

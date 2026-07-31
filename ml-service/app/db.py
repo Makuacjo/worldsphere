@@ -1,50 +1,40 @@
-"""SQLite storage for users and favorites (stdlib sqlite3, no ORM)."""
-from __future__ import annotations
-
+"""PostgreSQL storage with one connection per transaction."""
 import os
-import sqlite3
 from contextlib import contextmanager
+from pathlib import Path
+import psycopg
+from psycopg.rows import dict_row
 
-import common as C
+MIGRATION_DIR = Path(__file__).resolve().parent.parent / "migrations"
 
-DB_PATH = os.path.join(C.ARTIFACTS, "worldsphere.db")
+class ConfigurationError(RuntimeError):
+    pass
 
-_SCHEMA = """
-CREATE TABLE IF NOT EXISTS users (
-    id            INTEGER PRIMARY KEY AUTOINCREMENT,
-    name          TEXT NOT NULL,
-    email         TEXT NOT NULL UNIQUE,
-    password_hash TEXT NOT NULL,
-    created_at    TEXT NOT NULL DEFAULT (datetime('now'))
-);
-CREATE TABLE IF NOT EXISTS favorites (
-    id              INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id         INTEGER NOT NULL,
-    key             TEXT NOT NULL,
-    source          TEXT NOT NULL,
-    name            TEXT NOT NULL,
-    scientific_name TEXT,
-    image           TEXT,
-    created_at      TEXT NOT NULL DEFAULT (datetime('now')),
-    UNIQUE (user_id, source, key),
-    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
-);
-"""
-
-
-def init() -> None:
-    os.makedirs(C.ARTIFACTS, exist_ok=True)
-    with connect() as db:
-        db.executescript(_SCHEMA)
-
+def database_url():
+    url = os.getenv("DATABASE_URL", "").strip()
+    if not url:
+        raise ConfigurationError("DATABASE_URL is required; ephemeral SQLite is not used.")
+    if not url.startswith(("postgresql://", "postgres://")):
+        raise ConfigurationError("DATABASE_URL must be a PostgreSQL connection string.")
+    return url
 
 @contextmanager
 def connect():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA foreign_keys = ON")
+    with psycopg.connect(database_url(), row_factory=dict_row, connect_timeout=10) as connection:
+        yield connection
+
+def init():
+    migrations = sorted(MIGRATION_DIR.glob("*.sql"))
+    if not migrations:
+        raise RuntimeError(f"No database migrations found in: {MIGRATION_DIR}")
+    with connect() as connection:
+        for migration in migrations:
+            connection.execute(migration.read_text(encoding="utf-8"))
+
+def ready():
     try:
-        yield conn
-        conn.commit()
-    finally:
-        conn.close()
+        with connect() as connection:
+            connection.execute("SELECT 1").fetchone()
+        return True
+    except (ConfigurationError, psycopg.Error):
+        return False

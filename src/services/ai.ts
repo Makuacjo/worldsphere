@@ -1,6 +1,6 @@
-/** Streaming client for the Claude-powered ml-service /ai/ask endpoint. */
+/** Streaming client for the OpenRouter-powered ml-service /ai/ask endpoint. */
 
-const API_BASE = import.meta.env.VITE_ML_API_URL ?? 'http://localhost:8000';
+import { API_BASE_URL as API_BASE } from './apiConfig';
 
 export class AiError extends Error {}
 

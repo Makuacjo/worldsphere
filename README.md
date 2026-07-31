@@ -8,7 +8,7 @@ and real user accounts.
   glass navigation, a Three.js interactive globe, WebGL hero, and premium motion.
 - **Backend (`ml-service/`)** — FastAPI + scikit-learn: a conservation-risk model,
   dataset insights, a streaming AI naturalist (via OpenRouter), and accounts +
-  favorites (SQLite).
+  favorites (PostgreSQL).
 - **Live data** — species search over **GBIF** (hundreds of millions of records).
 
 ---
@@ -32,7 +32,7 @@ and real user accounts.
 
 - **Frontend:** React 19, TypeScript, Vite, React Router (data router), Framer Motion,
   Three.js, OGL, Recharts, React-Bootstrap, Lucide icons, `react-markdown`.
-- **Backend:** Python, FastAPI, scikit-learn, pandas, SQLite (stdlib), uvicorn.
+- **Backend:** Python, FastAPI, scikit-learn, pandas, PostgreSQL (`psycopg`), uvicorn.
 - **External:** GBIF API (keyless), OpenRouter (AI).
 
 ---
@@ -65,7 +65,7 @@ npm install
 npm run dev            # http://localhost:5173
 ```
 
-`.env` (already present) points the app at the backend:
+Copy `.env.example` to an untracked `.env` and point the app at the backend:
 
 ```
 VITE_ML_API_URL=http://localhost:8000
@@ -88,11 +88,14 @@ python model/train.py                       # trains the model → artifacts/
 uvicorn app.main:app --reload --port 8000
 ```
 
-To enable the **AI Explorer**, create `ml-service/.env` (gitignored):
+Create `ml-service/.env` from `ml-service/.env.example` (gitignored). PostgreSQL
+and a stable auth secret are required; OpenRouter is optional:
 
 ```
+DATABASE_URL=postgresql://user:password@localhost:5432/worldsphere
+AUTH_SECRET=replace-with-at-least-32-random-characters
 OPENROUTER_API_KEY=sk-or-v1-...
-# AI_MODEL=openai/gpt-4o-mini      # optional; any OpenRouter model id
+AI_MODEL=openrouter/free
 ```
 
 It's loaded automatically at startup. Without it, `/ai/ask` returns 503 and the
@@ -104,10 +107,12 @@ AI page shows a "not configured" state.
 
 | Where | Var | Purpose |
 |---|---|---|
-| `.env` (frontend) | `VITE_ML_API_URL` | Backend base URL (default `http://localhost:8000`). |
+| `.env` (frontend) | `VITE_ML_API_URL` | Backend base URL. Required in production; development defaults to `http://localhost:8000`. |
 | `ml-service/.env` | `OPENROUTER_API_KEY` | Enables the streaming AI naturalist. **Keep secret** — gitignored. |
-| `ml-service/.env` | `AI_MODEL` | OpenRouter model id (default `openai/gpt-4o-mini`). |
-| shell (optional) | `AUTH_SECRET` | Token-signing secret. Auto-generated + persisted to `artifacts/` if unset. |
+| `ml-service/.env` | `AI_MODEL` | OpenRouter model id (zero-cost default: `openrouter/free`). |
+| `ml-service/.env` | `DATABASE_URL` | Neon or local PostgreSQL connection string. Server-only and required. |
+| `ml-service/.env` | `AUTH_SECRET` | Stable token-signing secret of at least 32 bytes. Server-only and required. |
+| `ml-service/.env` | `FRONTEND_URL` / `CORS_ORIGINS` | Exact production frontend origin and optional comma-separated additional origins. |
 
 ---
 
@@ -123,7 +128,26 @@ AI page shows a "not configured" state.
 | GET | `/auth/me` | Current user (Bearer token) |
 | GET/POST | `/favorites` · DELETE `/favorites/{source}/{key}` | Per-user saved species |
 
-CORS is open to `http://localhost:5173`.
+CORS permits local Vite/preview origins plus exact origins configured through
+`FRONTEND_URL` and `CORS_ORIGINS`. Wildcards are rejected.
+
+## Production deployment
+
+Deploy the frontend `dist/` directory to Cloudflare Pages with build command
+`npm run build`; set the browser-visible `VITE_ML_API_URL` to the Render HTTPS
+service before building. `public/_redirects` preserves SPA routing.
+
+The repository `render.yaml` provisions the Render web-service definition. It
+installs Python dependencies and trains the model during the build, then starts
+one Uvicorn process on `$PORT`. Configure `DATABASE_URL` with Neon's pooled
+PostgreSQL URL, `FRONTEND_URL`, `APP_URL`, and any OpenRouter key in Render.
+Never put these server-only values in Cloudflare's `VITE_` variables.
+
+Authentication uses a compatible custom HMAC token and PBKDF2 password hashes.
+Credential endpoints have per-instance IP rate limiting. This is suitable for a
+small free deployment, but a multi-instance deployment should replace the
+in-memory limiter with a shared store and add password reset, email verification,
+session revocation, and security-event auditing.
 
 ---
 

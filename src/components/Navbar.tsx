@@ -1,15 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
-  Globe, Compass, BookOpen, Map, FlaskConical, Users, Sparkles,
-  User, Search, Sun, Moon,
+  Compass, BookOpen, Map, FlaskConical, Users, Sparkles,
+  User, Search, Sun, Moon, Plane,
 } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/auth';
+import { useTheme } from '../context/theme';
 
 type NavItem = { to: string; label: string; Icon: typeof Compass; cursor?: string };
 const NAV_ITEMS: NavItem[] = [
   { to: '/explore', label: 'Explore', Icon: Compass, cursor: 'globe' },
+  { to: '/tourism', label: 'Tourism', Icon: Plane, cursor: 'compass' },
   { to: '/stories', label: 'Stories', Icon: BookOpen },
   { to: '/maps', label: 'Maps', Icon: Map, cursor: 'compass' },
   { to: '/research', label: 'Research', Icon: FlaskConical },
@@ -54,8 +55,8 @@ const FloatingNav = () => {
       <header className={`fnav ${hidden ? 'is-hidden' : ''} ${atTop ? 'is-top' : ''}`}>
         <nav className="fnav__pill" aria-label="Primary">
           <Link to="/" className="fnav__brand">
-            <Globe size={20} strokeWidth={1.75} />
-            <span>WORLDSPHERE</span>
+            <img className="fnav__brand-logo" src="/WorldSphere-Logo-Package/WorldSphere-Logo.png" alt="WorldSphere" />
+            <img className="fnav__brand-icon" src="/WorldSphere-Logo-Package/WorldSphere-Icon.png" alt="" aria-hidden="true" />
           </Link>
 
           <ul className="fnav__list">

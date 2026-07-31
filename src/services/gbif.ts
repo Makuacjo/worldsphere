@@ -5,9 +5,21 @@
 
 const API = 'https://api.gbif.org/v1';
 
+// GBIF Backbone Taxonomy. Restricting search to it guarantees the returned
+// `key` is a usageKey that maps to occurrences, images, IUCN status and
+// distributions. Without it, `species/search` also returns keys from arbitrary
+// checklists that carry none of that — dead cards with no photo or location.
+const BACKBONE = 'd7dddbf4-2cf0-4f39-9b2a-bb099caae36c';
+
 // highertaxonKey values for kingdom filtering.
 export const KINGDOM = { Animals: 1, Plants: 6, Fungi: 5 } as const;
 export type KingdomKey = keyof typeof KINGDOM;
+
+// ISO 3166 alpha-2 → country name, via the platform (no dependency).
+const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
+const countryName = (code: string): string => {
+  try { return regionNames.of(code) ?? code; } catch { return code; }
+};
 
 export class GbifError extends Error {}
 
@@ -94,6 +106,7 @@ export const searchSpecies = async (
     q: query,
     rank: 'SPECIES',
     status: 'ACCEPTED',
+    datasetKey: BACKBONE,
     limit: String(limit),
     offset: String(offset),
   });
@@ -159,13 +172,46 @@ export const getOccurrenceCount = async (key: number): Promise<number> => {
   return data.count;
 };
 
-export const getCountries = async (key: number): Promise<string[]> => {
-  const data = await request<{ results: { country?: string; locality?: string }[] }>(
-    `/species/${key}/distributions?limit=30`
+// Where a species is actually recorded, ranked by number of occurrences.
+// Uses the occurrence country facet — populated for anything with records,
+// unlike the sparse checklist `distributions` endpoint.
+export interface CountryStat { code: string; name: string; count: number; }
+
+// Memoized: the Explore grid calls this once per card, and cards re-mount on
+// scroll/back-navigation — without the cache that's a heavy occurrence-facet
+// request every time. Keyed by taxon + count.
+const countriesCache = new Map<string, CountryStat[]>();
+
+export const getTopCountries = async (key: number, n = 8): Promise<CountryStat[]> => {
+  const ck = `${key}:${n}`;
+  const cached = countriesCache.get(ck);
+  if (cached) return cached;
+  const data = await request<{ facets?: { field: string; counts: { name: string; count: number }[] }[] }>(
+    `/occurrence/search?taxonKey=${key}&limit=0&facet=country&facetLimit=${n}`
   );
-  const set = new Set<string>();
-  for (const d of data.results ?? []) if (d.country) set.add(titleCase(d.country.toLowerCase()));
-  return Array.from(set).slice(0, 8);
+  const counts = data.facets?.[0]?.counts ?? [];
+  const stats = counts.map(c => ({ code: c.name, name: countryName(c.name), count: c.count }));
+  countriesCache.set(ck, stats);
+  return stats;
+};
+
+// Native range descriptions (regions/localities) from checklist distributions,
+// split by whether the population is native or introduced.
+export interface RangeInfo { native: string[]; introduced: string[]; }
+
+export const getRange = async (key: number): Promise<RangeInfo> => {
+  const data = await request<{ results?: { locality?: string; country?: string; establishmentMeans?: string }[] }>(
+    `/species/${key}/distributions?limit=50`
+  );
+  const native = new Set<string>();
+  const introduced = new Set<string>();
+  for (const d of data.results ?? []) {
+    const place = d.locality ?? (d.country ? countryName(d.country) : undefined);
+    if (!place) continue;
+    if ((d.establishmentMeans ?? '').toUpperCase() === 'INTRODUCED') introduced.add(place);
+    else native.add(place);
+  }
+  return { native: Array.from(native).slice(0, 12), introduced: Array.from(introduced).slice(0, 12) };
 };
 
 export const gbifOrgUrl = (key: number) => `https://www.gbif.org/species/${key}`;

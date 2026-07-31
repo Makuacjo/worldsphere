@@ -1,0 +1,8 @@
+.route-error{min-height:100dvh;display:grid;place-items:center;padding:2rem;color:var(--ink);background:radial-gradient(circle at 50% 30%,color-mix(in oklab,var(--accent-2) 22%,transparent),transparent 40%),var(--bg)}
+.route-error__panel{width:min(560px,100%);padding:clamp(1.5rem,5vw,3rem);border-radius:14px;background:var(--bg-elev);text-align:center}
+.route-error__icon{display:grid;place-items:center;width:56px;height:56px;margin:0 auto 1rem;border-radius:50%;color:var(--error-color);background:color-mix(in oklab,var(--error-color) 14%,transparent)}
+.route-error h1{margin:.35rem 0 .8rem;color:var(--ink-strong);font-size:var(--step-4)}
+.route-error__message{max-width:48ch;margin:0 auto;color:var(--ink-dim);overflow-wrap:anywhere}
+.route-error__actions{display:flex;justify-content:center;flex-wrap:wrap;gap:.65rem;margin-top:1.5rem}
+.route-error__actions .btn{display:inline-flex;align-items:center;gap:.4rem;border-radius:999px;text-decoration:none}
+.route-error__home{border:1px solid var(--border);color:var(--ink-strong);background:transparent}

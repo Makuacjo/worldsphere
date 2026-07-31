@@ -1,6 +1,6 @@
 /** Auth + favorites API client for the ml-service. */
 
-const API_BASE = import.meta.env.VITE_ML_API_URL ?? 'http://localhost:8000';
+import { API_BASE_URL as API_BASE } from './apiConfig';
 
 export interface User { id: number; name: string; email: string; }
 export interface Favorite {

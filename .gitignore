@@ -11,6 +11,10 @@ node_modules
 dist
 dist-ssr
 *.local
+*.db
+*.sqlite
+*.sqlite3
+ml-service/artifacts/
 
 # Agent skill installs (not project code)
 .claude/
@@ -32,3 +36,35 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Build, test, and tool caches
+build/
+coverage/
+.coverage
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.cache/
+
+# Temporary and archive files
+*.tmp
+*.temp
+*.bak
+*.old
+*.orig
+*.zip
+*.tar
+*.tar.gz
+
+# Local Codex/design tooling
+.codex/
+.impeccable/
+skills-lock.json
+
+# Deployment providers not used by this repository
+vercel.json
+.vercelignore
+
+# Windows metadata
+Thumbs.db
+Desktop.ini
