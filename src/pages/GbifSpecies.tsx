@@ -7,7 +7,7 @@ import {
 } from '../services/gbif';
 import FavoriteButton from '../components/FavoriteButton';
 
-// Heavy (world topojson + d3-geo) — only pulled in when a species detail renders.
+// Heavy (world topojson + d3-geo) â€” only pulled in when a species detail renders.
 const ChoroplethMap = lazy(() => import('../components/ChoroplethMap'));
 
 const STATUS_CODE: Record<string, string> = {
@@ -59,7 +59,7 @@ const GbifSpecies = () => {
   }, [id]);
 
   if (loading && !taxon) {
-    return <section className="page-shell"><div className="container"><p className="empty-note">Loading…</p></div></section>;
+    return <section className="page-shell"><div className="container"><p className="empty-note">Loadingâ€¦</p></div></section>;
   }
   if (error || !taxon) {
     return (
@@ -144,7 +144,7 @@ const GbifSpecies = () => {
 
             {countries.length > 0 && (
               <div className="gbif-range">
-                <span className="gbif-range__label">Occurrence map · {countries.length} countries</span>
+                <span className="gbif-range__label">Occurrence map Â· {countries.length} countries</span>
                 <Suspense fallback={<div className="choropleth choropleth--loading" aria-hidden="true" />}>
                   <ChoroplethMap data={countries} />
                 </Suspense>
@@ -185,7 +185,7 @@ const GbifSpecies = () => {
             <h2 className="section-sub" style={{ marginTop: 'var(--space-lg)' }}>From the field</h2>
             <div className="gbif-gallery">
               {gallery.slice(0, 8).map((src, i) => (
-                <img key={src} src={src} alt={`${title} ${i + 1}`} loading="lazy" />
+                <img key={src} src={src} alt={`${title} ${i + 1}`} loading="lazy" decoding="async" />
               ))}
             </div>
           </>

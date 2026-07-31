@@ -4,13 +4,13 @@ import { MapPin } from 'lucide-react';
 import { fetchTaxonImage, getTopCountries, STATUS_LABEL, type GbifCard as Card } from '../services/gbif';
 import FavoriteButton from './FavoriteButton';
 
-/** Species card for GBIF results — lazily fetches a representative image and
+/** Species card for GBIF results â€” lazily fetches a representative image and
  *  its top occurrence countries once it scrolls near the viewport, so a grid
  *  isn't N image + facet calls up front.
  *
  *  The card navigates via a stretched <Link> overlay rather than wrapping its
  *  contents in an anchor, so the FavoriteButton is a sibling (not a button
- *  nested inside a link — invalid DOM and a broken tab order). */
+ *  nested inside a link â€” invalid DOM and a broken tab order). */
 const GbifSpeciesCard = ({ card }: { card: Card }) => {
   const ref = useRef<HTMLElement>(null);
   const [img, setImg] = useState<string | null>(card.image ?? null);
@@ -28,7 +28,7 @@ const GbifSpeciesCard = ({ card }: { card: Card }) => {
     const io = new IntersectionObserver(entries => {
       const visible = entries.some(e => e.isIntersecting);
       if (visible) {
-        // Images preload eagerly (300px margin) — good perceived speed.
+        // Images preload eagerly (300px margin) â€” good perceived speed.
         if (!img && !imgFetched.current) {
           imgFetched.current = true;
           fetchTaxonImage(card.key).then(u => { if (u) setImg(u); }).finally(() => setTried(true));
@@ -60,7 +60,7 @@ const GbifSpeciesCard = ({ card }: { card: Card }) => {
           <img
             src={img}
             alt={card.name}
-            loading="lazy"
+            loading="lazy" decoding="async"
             className={loaded ? 'is-loaded' : ''}
             onLoad={() => setLoaded(true)}
           />
@@ -81,7 +81,7 @@ const GbifSpeciesCard = ({ card }: { card: Card }) => {
         <h3 className="gcard__name">{card.name}</h3>
         <p className="gcard__sci">{card.scientificName}</p>
         {places.length > 0 && (
-          <p className="gcard__where"><MapPin size={13} strokeWidth={2} aria-hidden="true" /> {places.join(' · ')}</p>
+          <p className="gcard__where"><MapPin size={13} strokeWidth={2} aria-hidden="true" /> {places.join(' Â· ')}</p>
         )}
       </div>
 

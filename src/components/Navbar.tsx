@@ -7,15 +7,15 @@ import {
 import { useAuth } from '../context/auth';
 import { useTheme } from '../context/theme';
 
-type NavItem = { to: string; label: string; Icon: typeof Compass; cursor?: string };
+type NavItem = { to: string; label: string; Icon: typeof Compass };
 const NAV_ITEMS: NavItem[] = [
-  { to: '/explore', label: 'Explore', Icon: Compass, cursor: 'globe' },
-  { to: '/tourism', label: 'Tourism', Icon: Plane, cursor: 'compass' },
+  { to: '/explore', label: 'Explore', Icon: Compass },
+  { to: '/tourism', label: 'Tourism', Icon: Plane },
   { to: '/stories', label: 'Stories', Icon: BookOpen },
-  { to: '/maps', label: 'Maps', Icon: Map, cursor: 'compass' },
+  { to: '/maps', label: 'Maps', Icon: Map },
   { to: '/research', label: 'Research', Icon: FlaskConical },
   { to: '/communities', label: 'Communities', Icon: Users },
-  { to: '/ai', label: 'AI', Icon: Sparkles, cursor: 'brain' },
+  { to: '/ai', label: 'AI', Icon: Sparkles },
 ];
 
 /**
@@ -56,13 +56,12 @@ const FloatingNav = () => {
         <nav className="fnav__pill" aria-label="Primary">
           <Link to="/" className="fnav__brand">
             <img className="fnav__brand-logo" src="/WorldSphere-Logo-Package/WorldSphere-Logo.png" alt="WorldSphere" />
-            <img className="fnav__brand-icon" src="/WorldSphere-Logo-Package/WorldSphere-Icon.png" alt="" aria-hidden="true" />
           </Link>
 
           <ul className="fnav__list">
-            {NAV_ITEMS.map(({ to, label, Icon, cursor }) => (
+            {NAV_ITEMS.map(({ to, label, Icon }) => (
               <li key={to}>
-                <Link to={to} data-cursor={cursor} className={`fnav__item ${isActive(to) ? 'is-active' : ''}`}>
+                <Link to={to} className={`fnav__item ${isActive(to) ? 'is-active' : ''}`}>
                   <Icon size={16} strokeWidth={1.75} />
                   <span>{label}</span>
                 </Link>
@@ -97,20 +96,13 @@ const FloatingNav = () => {
 
       {/* Mobile bottom dock */}
       <nav className="fdock" aria-label="Primary mobile">
-        <Link to="/explore" data-cursor="globe" className={`fdock__item ${isActive('/explore') ? 'is-active' : ''}`}>
-          <Compass size={22} strokeWidth={1.75} /><span>Explore</span>
-        </Link>
-        <Link to="/stories" className={`fdock__item ${isActive('/stories') ? 'is-active' : ''}`}>
-          <BookOpen size={22} strokeWidth={1.75} /><span>Stories</span>
-        </Link>
-        <Link to="/maps" data-cursor="compass" className={`fdock__item ${isActive('/maps') ? 'is-active' : ''}`}>
-          <Map size={22} strokeWidth={1.75} /><span>Maps</span>
-        </Link>
-        <Link to="/ai" data-cursor="brain" className={`fdock__item ${isActive('/ai') ? 'is-active' : ''}`}>
-          <Sparkles size={22} strokeWidth={1.75} /><span>AI</span>
-        </Link>
+        {NAV_ITEMS.map(({ to, label, Icon }) => (
+          <Link key={to} to={to} className={`fdock__item ${isActive(to) ? 'is-active' : ''}`}>
+            <Icon size={21} strokeWidth={1.75} aria-hidden="true" /><span>{label}</span>
+          </Link>
+        ))}
         <Link to={isAuthenticated ? '/profile' : '/login'} className={`fdock__item ${isActive('/profile') ? 'is-active' : ''}`}>
-          <User size={22} strokeWidth={1.75} /><span>You</span>
+          <User size={21} strokeWidth={1.75} aria-hidden="true" /><span>Profile</span>
         </Link>
       </nav>
     </>

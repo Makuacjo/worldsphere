@@ -166,7 +166,7 @@ const DestinationDetail = () => {
           {destination.slug === 'nairobi' ? NAIROBI_ATTRACTIONS.map((attraction) => {
             const attractionImages = getNairobiAttractionImages(attraction.slug);
             return <Link className="attraction-grid__link" to={`/destinations/nairobi/attractions/${attraction.slug}`} key={attraction.slug} aria-label={`View ${attraction.name} attraction guide`}>
-              <div className="attraction-grid__image"><img src={attractionImages?.hero ?? destination.hero} alt={`${attraction.name} in Nairobi`} loading="lazy" onError={(event) => { event.currentTarget.src = destination.hero; }} /></div>
+              <div className="attraction-grid__image"><img src={attractionImages?.hero ?? destination.hero} alt={`${attraction.name} in Nairobi`} loading="lazy" decoding="async" onError={(event) => { event.currentTarget.src = destination.hero; }} /></div>
               <div>
                 <div className="attraction-grid__heading"><h3>{attraction.name}</h3><ArrowRight size={18} /></div><p>{attraction.shortDescription}</p>
                 <dl><div><dt>Visit time</dt><dd>{attraction.visitDuration}</dd></div><div><dt>Hours</dt><dd>{attraction.openingHours}</dd></div><div><dt>Fee</dt><dd>{attraction.entryFee}</dd></div></dl>
@@ -175,7 +175,7 @@ const DestinationDetail = () => {
             </Link>;
           }) : destination.attractions.map((attraction) => (
             <article key={attraction.name}>
-              <img src={findLocalImage(localImages, attraction.name, destination.attractions.indexOf(attraction)) ?? attraction.image} alt={`${attraction.name} in ${destination.name}`} loading="lazy" onError={(event) => { event.currentTarget.src = attraction.image; }} />
+              <img src={findLocalImage(localImages, attraction.name, destination.attractions.indexOf(attraction)) ?? attraction.image} alt={`${attraction.name} in ${destination.name}`} loading="lazy" decoding="async" onError={(event) => { event.currentTarget.src = attraction.image; }} />
               <div>
                 <h3>{attraction.name}</h3><p>{attraction.description}</p>
                 <dl><div><dt>Visit time</dt><dd>{attraction.time}</dd></div><div><dt>Hours</dt><dd>{attraction.hours}</dd></div><div><dt>Fee</dt><dd>{attraction.fee}</dd></div></dl>
@@ -192,8 +192,8 @@ const DestinationDetail = () => {
           {destination.things.map((thing, index) => {
             const image = findLocalImage(localImages, thing, index);
             return <article key={thing}>
-              {image && <img src={image} alt={`${thing} in ${destination.name}`} loading="lazy" onError={(event) => { event.currentTarget.src = destination.hero; }} />}
-              <div><span>{String(index + 1).padStart(2, '0')}</span><h3>{thing}</h3><p>{index % 3 === 0 ? '2–4 hours' : index % 3 === 1 ? 'Half day' : 'Flexible'} · {index % 2 === 0 ? 'Couples, solo and families' : 'Active and curious travellers'}</p></div>
+              {image && <img src={image} alt={`${thing} in ${destination.name}`} loading="lazy" decoding="async" onError={(event) => { event.currentTarget.src = destination.hero; }} />}
+              <div><span>{String(index + 1).padStart(2, '0')}</span><h3>{thing}</h3><p>{index % 3 === 0 ? '2Ã¢â‚¬â€œ4 hours' : index % 3 === 1 ? 'Half day' : 'Flexible'} Ã‚Â· {index % 2 === 0 ? 'Couples, solo and families' : 'Active and curious travellers'}</p></div>
             </article>;
           })}
         </div>
@@ -211,7 +211,7 @@ const DestinationDetail = () => {
             const stayImages = localImages.filter((image) => /resort|lodge|hotel|beach/i.test(decodeURIComponent(image)));
             const image = stayImages[index % Math.max(stayImages.length, 1)] ?? localImages[index % Math.max(localImages.length, 1)];
             return <article key={type}>
-              {image && <img src={image} alt={`${type} inspiration in ${destination.name}`} loading="lazy" onError={(event) => { event.currentTarget.src = destination.hero; }} />}
+              {image && <img src={image} alt={`${type} inspiration in ${destination.name}`} loading="lazy" decoding="async" onError={(event) => { event.currentTarget.src = destination.hero; }} />}
               <div><h3>{type}</h3><p>{index === 0 ? 'Prioritise transport access and verified recent reviews.' : index === 1 ? 'Balance location, comfort and included transfers.' : 'Confirm meals, activity access and all transfer charges.'}</p><span>Check current availability</span></div>
             </article>;
           })}
@@ -269,13 +269,13 @@ const DestinationDetail = () => {
 
       <section className="destination-gallery">
         <header><h2>A feel for {destination.name}</h2><p>{gallery.length} local images from the destination collection. Select any image to open the full gallery.</p></header>
-        <div>{gallery.map((image, index) => <button type="button" key={`${image}-${index}`} onClick={() => setLightboxIndex(index)} aria-label={`Open ${readableImageName(image)} image ${index + 1} of ${gallery.length}`}><img src={image} alt={`${readableImageName(image)} in ${destination.name}`} loading="lazy" onError={(event) => { event.currentTarget.src = destination.hero; }} /></button>)}</div>
+        <div>{gallery.map((image, index) => <button type="button" key={`${image}-${index}`} onClick={() => setLightboxIndex(index)} aria-label={`Open ${readableImageName(image)} image ${index + 1} of ${gallery.length}`}><img src={image} alt={`${readableImageName(image)} in ${destination.name}`} loading="lazy" decoding="async" onError={(event) => { event.currentTarget.src = destination.hero; }} /></button>)}</div>
       </section>
 
       {lightboxIndex !== null && gallery[lightboxIndex] && <div className="destination-lightbox" role="dialog" aria-modal="true" aria-label={`${destination.name} image gallery`}>
         <button className="destination-lightbox__close" onClick={() => setLightboxIndex(null)} aria-label="Close gallery"><X size={24} /></button>
         <button className="destination-lightbox__previous" onClick={() => setLightboxIndex((lightboxIndex - 1 + gallery.length) % gallery.length)} aria-label="Previous image"><ChevronLeft size={28} /></button>
-        <figure><img src={gallery[lightboxIndex]} alt={`${readableImageName(gallery[lightboxIndex])} in ${destination.name}`} /><figcaption>{readableImageName(gallery[lightboxIndex])} · {lightboxIndex + 1} of {gallery.length}</figcaption></figure>
+        <figure><img src={gallery[lightboxIndex]} alt={`${readableImageName(gallery[lightboxIndex])} in ${destination.name}`} /><figcaption>{readableImageName(gallery[lightboxIndex])} Ã‚Â· {lightboxIndex + 1} of {gallery.length}</figcaption></figure>
         <button className="destination-lightbox__next" onClick={() => setLightboxIndex((lightboxIndex + 1) % gallery.length)} aria-label="Next image"><ChevronRight size={28} /></button>
       </div>}
 

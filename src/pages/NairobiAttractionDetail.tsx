@@ -91,7 +91,7 @@ const NairobiAttractionDetail = () => {
         <div className="attraction-hero__content">
           <Link to="/destinations/nairobi#attractions"><ArrowLeft size={17} /> Back to Nairobi</Link>
           <div>
-            <p><MapPin size={16} /> Nairobi, Kenya · {attraction.category}</p>
+            <p><MapPin size={16} /> Nairobi, Kenya Ã‚Â· {attraction.category}</p>
             <h1>{attraction.name}</h1>
             <span className="attraction-hero__rating"><Star size={16} fill="currentColor" /> {attraction.rating}</span>
             <p className="attraction-hero__intro">{attraction.shortDescription}</p>
@@ -128,7 +128,7 @@ const NairobiAttractionDetail = () => {
           {attraction.activities.map((activity, index) => {
             const image = imageSet.images[(index + 1) % imageSet.images.length];
             return <article key={activity}>
-              <img src={image} alt={`${activity} at ${attraction.name}`} loading="lazy" onError={(event) => { event.currentTarget.src = imageSet.hero; }} />
+              <img src={image} alt={`${activity} at ${attraction.name}`} loading="lazy" decoding="async" onError={(event) => { event.currentTarget.src = imageSet.hero; }} />
               <div><span>{String(index + 1).padStart(2, '0')}</span><h3>{activity}</h3><p>{index % 2 ? 'Suitable for curious and active travellers' : 'Suitable for families, couples and solo travellers'}</p></div>
             </article>;
           })}
@@ -139,7 +139,7 @@ const NairobiAttractionDetail = () => {
         <header><h2>Attraction gallery</h2><p>{gallery.length} images, all sourced only from the {imageSet.folder} folder.</p></header>
         <div>
           {gallery.map((image, index) => <button type="button" key={image} onClick={() => setLightboxIndex(index)} aria-label={`Open ${imageCaption(image)} image ${index + 1} of ${gallery.length}`}>
-            <img src={image} alt={`${imageCaption(image)} at ${attraction.name}`} loading="lazy" onError={(event) => { event.currentTarget.src = imageSet.hero; }} />
+            <img src={image} alt={`${imageCaption(image)} at ${attraction.name}`} loading="lazy" decoding="async" onError={(event) => { event.currentTarget.src = imageSet.hero; }} />
             <span>{imageCaption(image)}</span>
           </button>)}
         </div>
@@ -148,7 +148,7 @@ const NairobiAttractionDetail = () => {
       {lightboxIndex !== null && gallery[lightboxIndex] && <div className="attraction-lightbox" role="dialog" aria-modal="true" aria-label={`${attraction.name} gallery`}>
         <button className="attraction-lightbox__close" onClick={() => setLightboxIndex(null)} aria-label="Close gallery"><X size={24} /></button>
         <button className="attraction-lightbox__previous" onClick={() => setLightboxIndex((lightboxIndex - 1 + gallery.length) % gallery.length)} aria-label="Previous image"><ChevronLeft size={30} /></button>
-        <figure><img src={gallery[lightboxIndex]} alt={`${imageCaption(gallery[lightboxIndex])} at ${attraction.name}`} /><figcaption>{imageCaption(gallery[lightboxIndex])} · {lightboxIndex + 1} of {gallery.length}</figcaption></figure>
+        <figure><img src={gallery[lightboxIndex]} alt={`${imageCaption(gallery[lightboxIndex])} at ${attraction.name}`} /><figcaption>{imageCaption(gallery[lightboxIndex])} Ã‚Â· {lightboxIndex + 1} of {gallery.length}</figcaption></figure>
         <button className="attraction-lightbox__next" onClick={() => setLightboxIndex((lightboxIndex + 1) % gallery.length)} aria-label="Next image"><ChevronRight size={30} /></button>
       </div>}
 
@@ -172,7 +172,7 @@ const NairobiAttractionDetail = () => {
         <div>{related.map((item) => {
           const images = getNairobiAttractionImages(item.slug);
           return <Link to={`/destinations/nairobi/attractions/${item.slug}`} key={item.slug}>
-            {images?.hero && <img src={images.hero} alt="" loading="lazy" />}
+            {images?.hero && <img src={images.hero} alt="" loading="lazy" decoding="async" />}
             <span>{item.category}</span><strong>{item.name}</strong><ArrowRight size={18} />
           </Link>;
         })}</div>

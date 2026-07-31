@@ -39,7 +39,7 @@ const StoryCard = ({ entry, featured = false }: Props) => {
         <img
           src={image}
           alt={entry.name}
-          loading="lazy"
+          loading="lazy" decoding="async"
           style={{ viewTransitionName: isTransitioning ? 'species-media' : undefined }}
         />
         <div className="story__scrim" />

@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { Container } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
@@ -59,8 +59,6 @@ const ExplodingHeadline = () => {
                     duration: 3.2,
                     times: [0, 0.55, 0.76, 1],
                     delay: index * 0.018,
-                    repeat: Infinity,
-                    repeatDelay: 0.7,
                     ease: [0.34, 1.2, 0.64, 1],
                   }}
                 >
@@ -76,14 +74,28 @@ const ExplodingHeadline = () => {
   );
 };
 const Hero = () => {
+  const [showShader, setShowShader] = useState(false);
+
+  useEffect(() => {
+    const shouldSkip = window.matchMedia('(max-width: 767px), (prefers-reduced-motion: reduce)').matches;
+    if (shouldSkip) return;
+    const idle = window.requestIdleCallback?.(() => setShowShader(true), { timeout: 1200 });
+    const timer = idle === undefined ? window.setTimeout(() => setShowShader(true), 600) : undefined;
+    return () => {
+      if (idle !== undefined) window.cancelIdleCallback?.(idle);
+      if (timer !== undefined) window.clearTimeout(timer);
+    };
+  }, []);
   const magPrimary = useMagnetic<HTMLAnchorElement>();
   const magGhost = useMagnetic<HTMLAnchorElement>(0.25);
 
   return (
     <section className="hero">
-      <Suspense fallback={<div className="shader-stage" aria-hidden="true"><div className="shader-fallback" /></div>}>
-        <ShaderBackground />
-      </Suspense>
+      {showShader ? (
+        <Suspense fallback={<div className="shader-stage" aria-hidden="true"><div className="shader-fallback" /></div>}>
+          <ShaderBackground />
+        </Suspense>
+      ) : <div className="shader-stage" aria-hidden="true"><div className="shader-fallback" /></div>}
 
       <Container>
         <motion.div className="hero__inner" variants={container} initial="hidden" animate="show">
@@ -95,11 +107,11 @@ const Hero = () => {
 
           <motion.p className="hero__lede" variants={item}>
             Discover knowledge. Connect humanity. A living atlas of Earth's
-            animals, plants, and waters — told with the care of a field expedition.
+            animals, plants, and waters â€” told with the care of a field expedition.
           </motion.p>
 
           <motion.div className="hero__actions" variants={item}>
-            <Link ref={magPrimary} to="/explore" data-cursor="globe" className="btn btn-solar">
+            <Link ref={magPrimary} to="/explore" className="btn btn-solar">
               <Compass size={18} strokeWidth={2} /> Begin Exploring
             </Link>
             <Link ref={magGhost} to="/stories" className="btn btn-ghost">

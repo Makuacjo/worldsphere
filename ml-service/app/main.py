@@ -11,6 +11,7 @@ import psycopg
 
 from fastapi import FastAPI, HTTPException, Depends, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
@@ -33,6 +34,8 @@ async def lifespan(_: FastAPI):
 
 app = FastAPI(title="WorldSphere Conservation Insights API", version="1.0.0",
               lifespan=lifespan)
+
+app.add_middleware(GZipMiddleware, minimum_size=500)
 
 # Allow the Vite dev server (and preview) to call the API from the browser.
 app.add_middleware(

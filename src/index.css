@@ -2,7 +2,7 @@
    WorldSphere design system
    DirEngine-inspired identity (coral / cyan / mint / charcoal). Fonts, fluid type scale,
    spacing rhythm, motion tokens, and a semantic z-index scale layered on top.
-   All original color-var names are kept intact — components depend on them.
+   All original color-var names are kept intact Ã¢â‚¬â€ components depend on them.
    ========================================================================== */
 
 :root {
@@ -137,7 +137,7 @@
   box-sizing: border-box;
 }
 
-/* Media never overflows its container — the #1 source of mobile horizontal scroll.
+/* Media never overflows its container Ã¢â‚¬â€ the #1 source of mobile horizontal scroll.
    svg is left inline (display unchanged) so lucide icons keep their text alignment. */
 img, video, canvas, picture {
   max-width: 100%;
@@ -323,7 +323,7 @@ a:hover { color: var(--highlight-color); }
   width: 100%;
   height: 100%;
 }
-/* Visible until (and if) the WebGL canvas paints over it — also the final
+/* Visible until (and if) the WebGL canvas paints over it Ã¢â‚¬â€ also the final
    fallback when WebGL is unavailable. On-brand forest gradient. */
 .shader-fallback {
   position: absolute;
@@ -343,7 +343,7 @@ a:hover { color: var(--highlight-color); }
   overflow: hidden;
   isolation: isolate;
 }
-/* Legibility scrim over the shader — darker at the bottom where text sits. */
+/* Legibility scrim over the shader Ã¢â‚¬â€ darker at the bottom where text sits. */
 .hero::after {
   content: '';
   position: absolute;
@@ -527,14 +527,12 @@ a:hover { color: var(--highlight-color); }
   text-decoration: none;
   white-space: nowrap;
 }
-.fnav__brand-logo,
-.fnav__brand-icon {
+.fnav__brand-logo {
   display: block;
   width: auto;
   object-fit: contain;
 }
 .fnav__brand-logo { height: 1.45rem; }
-.fnav__brand-icon { display: none; height: 1.4rem; }
 .footer__brand-logo {
   display: block;
   width: auto;
@@ -596,13 +594,14 @@ a:hover { color: var(--highlight-color); }
 }
 .fnav__profile:hover { transform: translateY(-1px); filter: brightness(1.06); color: #222831; }
 
-/* Compact the pill before it wraps: drop labels, keep icons */
+/* Compact spacing at narrower desktop widths while keeping every label visible. */
 @media (max-width: 1080px) {
-  .fnav__item span,
-  .fnav__profile span,
-  .fnav__brand-logo { display: none; }
-  .fnav__brand-icon { display: block; }
-  .fnav__item { padding: 0.5rem 0.6rem; }
+  .fnav { width: calc(100% - 1rem); }
+  .fnav__pill { gap: 0.35rem; padding-inline: 0.65rem; }
+  .fnav__brand-logo { height: 1.25rem; }
+  .fnav__item { gap: 0.25rem; padding: 0.5rem 0.45rem; font-size: 0.78rem; }
+  .fnav__actions { gap: 0.15rem; }
+  .fnav__profile { padding-inline: 0.65rem; }
 }
 @media (max-width: 860px) { .fnav { display: none; } }
 
@@ -787,7 +786,7 @@ a:hover { color: var(--highlight-color); }
 }
 .wcard__link:hover span { transform: translateX(4px); }
 
-/* Page shell — clears the fixed navbar and sets the catalog/detail rhythm */
+/* Page shell Ã¢â‚¬â€ clears the fixed navbar and sets the catalog/detail rhythm */
 .page-shell {
   background: var(--surface-color);
   min-height: 100vh;
@@ -971,7 +970,7 @@ a:hover { color: var(--highlight-color); }
 }
 
 /* ------------------------------------------------- View transitions ------ */
-/* Card image ↔ species hero morph + a soft crossfade between routes. */
+/* Card image Ã¢â€ â€ species hero morph + a soft crossfade between routes. */
 @media (prefers-reduced-motion: no-preference) {
   ::view-transition-old(root),
   ::view-transition-new(root) {
@@ -1230,14 +1229,14 @@ a:hover { color: var(--highlight-color); }
   background: linear-gradient(100deg, transparent 30%, var(--glass) 50%, transparent 70%);
   animation: shimmer 1.4s infinite;
 }
-.gcard__ph.is-static::after { display: none; } /* no photo found — stop shimmering */
+.gcard__ph.is-static::after { display: none; } /* no photo found Ã¢â‚¬â€ stop shimmering */
 @keyframes shimmer { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
 .gcard__scrim {
   position: absolute;
   inset: 0;
   background: linear-gradient(to top, rgba(8, 12, 15, 0.92) 4%, rgba(8, 12, 15, 0.3) 46%, transparent 100%);
 }
-/* Stretched navigation overlay — the whole card is clickable, but the anchor
+/* Stretched navigation overlay Ã¢â‚¬â€ the whole card is clickable, but the anchor
    is a sibling of the favorite button, not its ancestor (valid DOM, clean tab order). */
 .gcard__link { position: absolute; inset: 0; z-index: 2; border-radius: inherit; }
 .gcard__link:focus-visible { outline: 2px solid var(--accent-bright); outline-offset: 2px; }
@@ -1286,7 +1285,7 @@ a:hover { color: var(--highlight-color); }
 .gbif-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.6rem; }
 .gbif-gallery img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: var(--radius-sm); }
 
-/* GBIF — where it's found */
+/* GBIF Ã¢â‚¬â€ where it's found */
 .gbif-where { margin-bottom: var(--space-md); }
 .gbif-range { margin-top: 0.9rem; }
 .gbif-range__label { display: block; font-size: 0.7rem; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-dim); margin-bottom: 0.45rem; }
@@ -1889,13 +1888,6 @@ button.chip--sm, a.chip--sm { cursor: pointer; } /* interactive chips (suggestio
   margin-bottom: var(--space-sm);
 }
 
-/* ------------------------------------------------ Constellation cursor --- */
-.constellation {
-  position: fixed;
-  inset: 0;
-  z-index: 200;
-  pointer-events: none;
-}
 
 /* Accessibility skip link */
 .skip-link {
@@ -1923,5 +1915,13 @@ button.chip--sm, a.chip--sm { cursor: pointer; } /* interactive chips (suggestio
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+
+@supports (content-visibility: auto) {
+  .home-section {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 800px;
   }
 }

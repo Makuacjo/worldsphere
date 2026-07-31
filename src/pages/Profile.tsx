@@ -54,7 +54,7 @@ const Profile = () => {
                   {favorites.map(f => (
                     <div key={`${f.source}:${f.key}`} className="fav-item">
                       <Link to={favLink(f.source, f.key)} className="fav-item__media">
-                        {f.image ? <img src={f.image} alt={f.name} loading="lazy" /> : <div className="fav-item__ph" />}
+                        {f.image ? <img src={f.image} alt={f.name} loading="lazy" decoding="async" /> : <div className="fav-item__ph" />}
                       </Link>
                       <div className="fav-item__body">
                         <Link to={favLink(f.source, f.key)} className="fav-item__name">{f.name}</Link>

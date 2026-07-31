@@ -1,5 +1,5 @@
 /**
- * GBIF (Global Biodiversity Information Facility) client — https://www.gbif.org
+ * GBIF (Global Biodiversity Information Facility) client â€” https://www.gbif.org
  * Free, keyless, CORS-enabled. Powers the Explore surface with real species.
  */
 
@@ -8,14 +8,14 @@ const API = 'https://api.gbif.org/v1';
 // GBIF Backbone Taxonomy. Restricting search to it guarantees the returned
 // `key` is a usageKey that maps to occurrences, images, IUCN status and
 // distributions. Without it, `species/search` also returns keys from arbitrary
-// checklists that carry none of that — dead cards with no photo or location.
+// checklists that carry none of that â€” dead cards with no photo or location.
 const BACKBONE = 'd7dddbf4-2cf0-4f39-9b2a-bb099caae36c';
 
 // highertaxonKey values for kingdom filtering.
 export const KINGDOM = { Animals: 1, Plants: 6, Fungi: 5 } as const;
 export type KingdomKey = keyof typeof KINGDOM;
 
-// ISO 3166 alpha-2 → country name, via the platform (no dependency).
+// ISO 3166 alpha-2 â†’ country name, via the platform (no dependency).
 const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
 const countryName = (code: string): string => {
   try { return regionNames.of(code) ?? code; } catch { return code; }
@@ -42,7 +42,7 @@ export interface GbifCard {
   name: string;         // best common name, else scientific
   scientificName: string;
   kingdom: string;
-  status?: string;      // IUCN code: LC/NT/VU/EN/CR/…
+  status?: string;      // IUCN code: LC/NT/VU/EN/CR/â€¦
   image?: string;
 }
 
@@ -63,15 +63,40 @@ export const STATUS_LABEL: Record<string, string> = {
   EW: 'Extinct in the Wild', DD: 'Data Deficient',
 };
 
+const responseCache = new Map<string, { expires: number; value: unknown }>();
+const pendingRequests = new Map<string, Promise<unknown>>();
+const CACHE_TTL_MS = 5 * 60 * 1000;
+const MAX_CACHE_ENTRIES = 100;
+
 const request = async <T>(path: string): Promise<T> => {
-  let res: Response;
+  const cached = responseCache.get(path);
+  if (cached && cached.expires > Date.now()) return cached.value as T;
+
+  const pending = pendingRequests.get(path);
+  if (pending) return pending as Promise<T>;
+
+  const run = (async () => {
+    let res: Response;
+    try {
+      res = await fetch(`${API}${path}`);
+    } catch {
+      throw new GbifError('Could not reach GBIF. Check your connection and try again.');
+    }
+    if (!res.ok) throw new GbifError(`GBIF request failed (${res.status}).`);
+    const value = await res.json() as T;
+    if (responseCache.size >= MAX_CACHE_ENTRIES) {
+      responseCache.delete(responseCache.keys().next().value!);
+    }
+    responseCache.set(path, { expires: Date.now() + CACHE_TTL_MS, value });
+    return value;
+  })();
+
+  pendingRequests.set(path, run);
   try {
-    res = await fetch(`${API}${path}`);
-  } catch {
-    throw new GbifError('Could not reach GBIF. Check your connection and try again.');
+    return await run;
+  } finally {
+    pendingRequests.delete(path);
   }
-  if (!res.ok) throw new GbifError(`GBIF request failed (${res.status}).`);
-  return res.json() as Promise<T>;
 };
 
 const englishName = (t: GbifTaxon): string | undefined => {
@@ -90,7 +115,7 @@ export const toCard = (t: GbifTaxon): GbifCard => {
     key: t.key,
     name: common ? titleCase(common) : sci,
     scientificName: sci,
-    kingdom: t.kingdom ?? '—',
+    kingdom: t.kingdom ?? 'â€”',
     status: raw ? STATUS_CODE[raw] : undefined,
   };
 };
@@ -153,7 +178,7 @@ export const getDescription = async (key: number): Promise<string | null> => {
   const best = data.results?.find(d => (d.description ?? '').length > 80) ?? data.results?.[0];
   const text = best?.description;
   if (!text) return null;
-  // GBIF descriptions can carry HTML — strip tags for safe plain rendering.
+  // GBIF descriptions can carry HTML â€” strip tags for safe plain rendering.
   return text.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
 };
 
@@ -173,12 +198,12 @@ export const getOccurrenceCount = async (key: number): Promise<number> => {
 };
 
 // Where a species is actually recorded, ranked by number of occurrences.
-// Uses the occurrence country facet — populated for anything with records,
+// Uses the occurrence country facet â€” populated for anything with records,
 // unlike the sparse checklist `distributions` endpoint.
 export interface CountryStat { code: string; name: string; count: number; }
 
 // Memoized: the Explore grid calls this once per card, and cards re-mount on
-// scroll/back-navigation — without the cache that's a heavy occurrence-facet
+// scroll/back-navigation â€” without the cache that's a heavy occurrence-facet
 // request every time. Keyed by taxon + count.
 const countriesCache = new Map<string, CountryStat[]>();
 

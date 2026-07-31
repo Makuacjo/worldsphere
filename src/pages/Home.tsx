@@ -77,7 +77,7 @@ const Home = () => {
               Spin the planet and follow life across continents. Every region tells
               a different story of adaptation and survival.
             </p>
-            <Link to="/maps" data-cursor="compass" className="btn btn-solar"><Compass size={18} strokeWidth={2} /> Open the globe</Link>
+            <Link to="/maps" className="btn btn-solar"><Compass size={18} strokeWidth={2} /> Open the globe</Link>
           </Reveal>
         </div>
       </section>
@@ -97,7 +97,7 @@ const Home = () => {
             {REGIONS.map((region, i) => (
               <Reveal key={region.name} delay={(i % 3) * 0.06}>
                 <Link to={`/stories?region=${encodeURIComponent(region.name)}`} className="region-card">
-                  <img className="region-card__image" src={region.image} alt={region.alt} loading="lazy" />
+                  <img className="region-card__image" src={region.image} alt={region.alt} loading="lazy" decoding="async" />
                   <span className="region-card__shade" aria-hidden="true" />
                   <span className="region-card__content">
                     <small>Explore biodiversity</small>
@@ -124,7 +124,7 @@ const Home = () => {
                   Predict a species' conservation future, surface life by region, and
                   explore the data behind every answer.
                 </p>
-                <Link to="/ai" data-cursor="brain" className="btn btn-solar">Try AI Explorer <ArrowRight size={16} strokeWidth={2} /></Link>
+                <Link to="/ai" className="btn btn-solar">Try AI Explorer <ArrowRight size={16} strokeWidth={2} /></Link>
               </div>
             </div>
           </Reveal>

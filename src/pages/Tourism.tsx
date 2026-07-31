@@ -38,10 +38,10 @@ const DESTINATIONS: Destination[] = [
 ];
 
 const SEASONS = [
-  ['Jan – Feb', 'Warm and clear', 'Excellent for beaches, hiking and wildlife around water sources.', '24–31°C'],
-  ['Mar – May', 'Green season', 'Long rains, fewer visitors, vivid landscapes and better-value stays.', '21–28°C'],
-  ['Jun – Oct', 'Classic safari', 'Dry days, migration season and the most reliable game viewing.', '18–27°C'],
-  ['Nov – Dec', 'Short rains', 'Fresh scenery, bird migration and pockets of shoulder-season value.', '22–29°C'],
+  ['Jan â€“ Feb', 'Warm and clear', 'Excellent for beaches, hiking and wildlife around water sources.', '24â€“31Â°C'],
+  ['Mar â€“ May', 'Green season', 'Long rains, fewer visitors, vivid landscapes and better-value stays.', '21â€“28Â°C'],
+  ['Jun â€“ Oct', 'Classic safari', 'Dry days, migration season and the most reliable game viewing.', '18â€“27Â°C'],
+  ['Nov â€“ Dec', 'Short rains', 'Fresh scenery, bird migration and pockets of shoulder-season value.', '22â€“29Â°C'],
 ];
 
 const Tourism = () => {
@@ -104,7 +104,7 @@ const filtered = useMemo(() => DESTINATIONS
       <section className="tourism-intro">
         <div><span>KE</span><p>One country. Countless journeys.</p></div>
         <dl>
-          <div><dt>Ideal first trip</dt><dd>7–10 days</dd></div>
+          <div><dt>Ideal first trip</dt><dd>7â€“10 days</dd></div>
           <div><dt>Daily budget</dt><dd>From KSh 10,500</dd></div>
           <div><dt>Languages</dt><dd>Swahili, English</dd></div>
           <div><dt>Currency</dt><dd>Kenyan shilling</dd></div>
@@ -118,7 +118,7 @@ const filtered = useMemo(() => DESTINATIONS
             <div className="tour-directory__filter-head"><div><span>Trip finder</span><h3>Explore Kenya</h3></div><Compass size={22} /></div>
             <form onSubmit={(event) => event.preventDefault()}>
               <label htmlFor="directory-search">Destination or county</label>
-              <div className="tour-directory__search"><Search size={18} /><input id="directory-search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Maasai Mara, Kwale…" /></div>
+              <div className="tour-directory__search"><Search size={18} /><input id="directory-search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Maasai Mara, Kwaleâ€¦" /></div>
               <label htmlFor="directory-category">Experience</label>
               <select id="directory-category" value={category} onChange={(event) => setCategory(event.target.value)}>
                 {['All', 'Safari', 'Beach', 'Adventure', 'City', 'Culture'].map((item) => <option key={item} value={item}>{item === 'All' ? 'All experiences' : item}</option>)}
@@ -145,7 +145,7 @@ const filtered = useMemo(() => DESTINATIONS
                 <Reveal key={item.name} delay={(index % 2) * .05}>
                   <article className="destination-card">
                     <div className="destination-card__media">
-                      <Link className="destination-card__image-link" to={`/destinations/${destinationSlug(item.name)}`} aria-label={`Open the ${item.name} travel guide`}><img src={item.image} alt={`${item.name}, Kenya`} loading="lazy" /></Link>
+                      <Link className="destination-card__image-link" to={`/destinations/${destinationSlug(item.name)}`} aria-label={`Open the ${item.name} travel guide`}><img src={item.image} alt={`${item.name}, Kenya`} loading="lazy" decoding="async" /></Link>
                       <button type="button" aria-label={`Save ${item.name}`}><Heart size={18} /></button><span>{item.category}</span>
                     </div>
                     <div className="destination-card__body">
@@ -170,13 +170,13 @@ const filtered = useMemo(() => DESTINATIONS
 
       <section id="map-guide" className="tour-map">
         <div className="tour-map__visual">
-          <Suspense fallback={<div className="kenya-map-loading">Loading the Kenya map…</div>}>
+          <Suspense fallback={<div className="kenya-map-loading">Loading the Kenya mapâ€¦</div>}>
             <KenyaTourMap destinations={DESTINATIONS} selected={selected} onSelect={(destination) => { const match = DESTINATIONS.find((item) => item.name === destination.name); if (match) setSelected(match); }} />
           </Suspense>
         </div>
         <div className="tour-map__guide">
           <p className="tour-label">Interactive route finder</p><h2>{selected.name}</h2><p>{selected.note}</p>
-          <div className="tour-map__weather"><CloudSun size={27} /><span><strong>26°C</strong> Pleasant, light breeze</span></div>
+          <div className="tour-map__weather"><CloudSun size={27} /><span><strong>26Â°C</strong> Pleasant, light breeze</span></div>
           <dl><div><dt>From Nairobi</dt><dd>{selected.travel}</dd></div><div><dt>Entry guide</dt><dd>{selected.fee}</dd></div><div><dt>Best season</dt><dd>{selected.months}</dd></div><div><dt>Recommended stay</dt><dd>{selected.duration}</dd></div></dl>
           <div className="tour-map__nearby"><span><Hotel size={16} /> 18 stays</span><span><Utensils size={16} /> 12 restaurants</span><span><Compass size={16} /> 9 experiences</span></div>
           <p className="tour-note"><Info size={15} /> Fees are planning estimates. Confirm official rates before travel.</p>
@@ -206,14 +206,14 @@ const filtered = useMemo(() => DESTINATIONS
       <section id="itineraries" className="tour-section">
         <header className="tour-section__head"><div><p className="tour-label">Ready-made routes</p><h2>Start with a journey that already works.</h2></div><p>Balanced pacing, realistic transfers and space for unplanned discoveries.</p></header>
         <div className="itinerary-list">
-          {[['3 days', 'Nairobi in focus', 'Nairobi National Park • Karen • City culture', 'From KSh 48,000', IMAGES.city], ['5 days', 'The safari classic', 'Nairobi • Lake Naivasha • Maasai Mara', 'From KSh 128,000', IMAGES.safari], ['10 days', 'Bush to beach', 'Amboseli • Tsavo • Diani Beach', 'From KSh 265,000', IMAGES.beach]].map((trip) =>
-            <article key={trip[1]}><img src={trip[4]} alt="" loading="lazy" /><div><span>{trip[0]}</span><h3>{trip[1]}</h3><p>{trip[2]}</p></div><div className="itinerary-list__price"><small>Estimate</small><strong>{trip[3]}</strong><button onClick={() => go('planner')}>Customize <ChevronRight size={17} /></button></div></article>)}
+          {[['3 days', 'Nairobi in focus', 'Nairobi National Park â€¢ Karen â€¢ City culture', 'From KSh 48,000', IMAGES.city], ['5 days', 'The safari classic', 'Nairobi â€¢ Lake Naivasha â€¢ Maasai Mara', 'From KSh 128,000', IMAGES.safari], ['10 days', 'Bush to beach', 'Amboseli â€¢ Tsavo â€¢ Diani Beach', 'From KSh 265,000', IMAGES.beach]].map((trip) =>
+            <article key={trip[1]}><img src={trip[4]} alt="" loading="lazy" decoding="async" /><div><span>{trip[0]}</span><h3>{trip[1]}</h3><p>{trip[2]}</p></div><div className="itinerary-list__price"><small>Estimate</small><strong>{trip[3]}</strong><button onClick={() => go('planner')}>Customize <ChevronRight size={17} /></button></div></article>)}
         </div>
       </section>
 
       <section className="tour-collections">
-        <article><img src={IMAGES.elephant} alt="Elephants on a Kenyan safari" loading="lazy" /><div><TentTree size={25} /><h2>The safari field guide</h2><p>Big Five sightings, game-drive etiquette, migration timing, photography and conservation.</p><button onClick={() => { setCategory('Safari'); go('destinations'); }}>Explore safaris <ArrowRight size={17} /></button></div></article>
-        <article><img src={IMAGES.beach} alt="Turquoise water at the Kenyan coast" loading="lazy" /><div><Sun size={25} /><h2>The coast, unhurried</h2><p>Diani, Watamu, Malindi, Tiwi and Lamu, with water sports, food and family guidance.</p><button onClick={() => { setCategory('Beach'); go('destinations'); }}>Explore the coast <ArrowRight size={17} /></button></div></article>
+        <article><img src={IMAGES.elephant} alt="Elephants on a Kenyan safari" loading="lazy" decoding="async" /><div><TentTree size={25} /><h2>The safari field guide</h2><p>Big Five sightings, game-drive etiquette, migration timing, photography and conservation.</p><button onClick={() => { setCategory('Safari'); go('destinations'); }}>Explore safaris <ArrowRight size={17} /></button></div></article>
+        <article><img src={IMAGES.beach} alt="Turquoise water at the Kenyan coast" loading="lazy" decoding="async" /><div><Sun size={25} /><h2>The coast, unhurried</h2><p>Diani, Watamu, Malindi, Tiwi and Lamu, with water sports, food and family guidance.</p><button onClick={() => { setCategory('Beach'); go('destinations'); }}>Explore the coast <ArrowRight size={17} /></button></div></article>
       </section>
 
       <section id="essentials" className="tour-section">
