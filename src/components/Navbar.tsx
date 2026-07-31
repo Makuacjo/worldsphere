@@ -56,7 +56,7 @@ const FloatingNav = () => {
       <header className={`fnav ${hidden ? 'is-hidden' : ''} ${atTop ? 'is-top' : ''}`}>
         <nav className="fnav__pill" aria-label="Primary">
           <Link to="/" className="fnav__brand">
-            <Globe2 className="fnav__brand-mark" size={20} strokeWidth={1.8} aria-hidden="true" />
+            <Globe2 className="fnav__brand-mark" size={22} strokeWidth={1.8} aria-hidden="true" />
             <span>WORLDSPHERE</span>
           </Link>
 
@@ -64,7 +64,7 @@ const FloatingNav = () => {
             {NAV_ITEMS.map(({ to, label, Icon }) => (
               <li key={to}>
                 <Link to={to} className={`fnav__item ${isActive(to) ? 'is-active' : ''}`}>
-                  <Icon size={16} strokeWidth={1.75} />
+                  <Icon size={20} strokeWidth={1.8} />
                   <span>{label}</span>
                 </Link>
               </li>
@@ -78,7 +78,7 @@ const FloatingNav = () => {
               aria-label="Search"
               onClick={() => navigate('/search')}
             >
-              <Search size={18} strokeWidth={1.75} />
+              <Search size={21} strokeWidth={1.8} />
             </button>
             <button
               type="button"
@@ -86,10 +86,10 @@ const FloatingNav = () => {
               aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
               onClick={toggleTheme}
             >
-              {theme === 'light' ? <Moon size={18} strokeWidth={1.75} /> : <Sun size={18} strokeWidth={1.75} />}
+              {theme === 'light' ? <Moon size={21} strokeWidth={1.8} /> : <Sun size={21} strokeWidth={1.8} />}
             </button>
             <Link to={isAuthenticated ? '/profile' : '/login'} className="fnav__profile">
-              <User size={16} strokeWidth={1.75} />
+              <User size={19} strokeWidth={1.8} />
               <span>{isAuthenticated ? (user?.name?.split(' ')[0] ?? 'Profile') : 'Sign In'}</span>
             </Link>
           </div>

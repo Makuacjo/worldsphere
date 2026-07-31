@@ -432,7 +432,7 @@ a:hover { color: var(--highlight-color); }
 }
 .hero__scroll span {
   width: 1px;
-  height: 42px;
+  height: 38px;
   background: linear-gradient(to bottom, transparent, var(--highlight-color));
   animation: scrollpulse 2.4s var(--ease-in-out-soft) infinite;
 }
@@ -566,8 +566,8 @@ a:hover { color: var(--highlight-color); }
 .fnav__icon-btn {
   display: grid;
   place-items: center;
-  width: 38px;
-  height: 38px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   background: transparent;
   border: 1px solid transparent;
@@ -1143,8 +1143,8 @@ a:hover { color: var(--highlight-color); }
   right: 1rem;
   display: grid;
   place-items: center;
-  width: 42px;
-  height: 42px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   color: #fff;
   background: rgba(248, 89, 89, .92);
