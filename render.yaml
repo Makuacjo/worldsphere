@@ -24,6 +24,14 @@ services:
         sync: false
       - key: AI_MODEL
         value: openrouter/free
+      - key: AI_PROVIDER_SORT
+        value: latency
+      - key: AI_CONNECT_TIMEOUT_SECONDS
+        value: 5
+      - key: AI_RESPONSE_TIMEOUT_SECONDS
+        value: 45
+      - key: DATABASE_POOL_SIZE
+        value: 5
       - key: AI_RATE_LIMIT_PER_MINUTE
         value: 20
       - key: AUTH_RATE_LIMIT_PER_MINUTE

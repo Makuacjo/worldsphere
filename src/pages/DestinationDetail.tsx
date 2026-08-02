@@ -193,7 +193,7 @@ const DestinationDetail = () => {
             const image = findLocalImage(localImages, thing, index);
             return <article key={thing}>
               {image && <img src={image} alt={`${thing} in ${destination.name}`} loading="lazy" decoding="async" onError={(event) => { event.currentTarget.src = destination.hero; }} />}
-              <div><span>{String(index + 1).padStart(2, '0')}</span><h3>{thing}</h3><p>{index % 3 === 0 ? '2Ã¢â‚¬â€œ4 hours' : index % 3 === 1 ? 'Half day' : 'Flexible'} Ã‚Â· {index % 2 === 0 ? 'Couples, solo and families' : 'Active and curious travellers'}</p></div>
+              <div><span>{String(index + 1).padStart(2, '0')}</span><h3>{thing}</h3><p>{index % 3 === 0 ? '2–4 hours' : index % 3 === 1 ? 'Half day' : 'Flexible'} · {index % 2 === 0 ? 'Couples, solo and families' : 'Active and curious travellers'}</p></div>
             </article>;
           })}
         </div>
@@ -275,7 +275,7 @@ const DestinationDetail = () => {
       {lightboxIndex !== null && gallery[lightboxIndex] && <div className="destination-lightbox" role="dialog" aria-modal="true" aria-label={`${destination.name} image gallery`}>
         <button className="destination-lightbox__close" onClick={() => setLightboxIndex(null)} aria-label="Close gallery"><X size={24} /></button>
         <button className="destination-lightbox__previous" onClick={() => setLightboxIndex((lightboxIndex - 1 + gallery.length) % gallery.length)} aria-label="Previous image"><ChevronLeft size={28} /></button>
-        <figure><img src={gallery[lightboxIndex]} alt={`${readableImageName(gallery[lightboxIndex])} in ${destination.name}`} /><figcaption>{readableImageName(gallery[lightboxIndex])} Ã‚Â· {lightboxIndex + 1} of {gallery.length}</figcaption></figure>
+        <figure><img src={gallery[lightboxIndex]} alt={`${readableImageName(gallery[lightboxIndex])} in ${destination.name}`} /><figcaption>{readableImageName(gallery[lightboxIndex])} · {lightboxIndex + 1} of {gallery.length}</figcaption></figure>
         <button className="destination-lightbox__next" onClick={() => setLightboxIndex((lightboxIndex + 1) % gallery.length)} aria-label="Next image"><ChevronRight size={28} /></button>
       </div>}
 

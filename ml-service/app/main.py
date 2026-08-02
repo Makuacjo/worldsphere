@@ -22,6 +22,7 @@ from app.schemas import (
 from app.service import Model
 from app import ai, db, auth, account
 from app.ai_core.router import router as shared_ai_router
+from app.ai_core import client as ai_client
 from app.ai_core import rate_limit as ai_rate_limit
 from app.config import parse_cors_origins, validate_auth_secret
 from app.login_rate_limit import enforce as enforce_auth_rate_limit
@@ -31,6 +32,8 @@ async def lifespan(_: FastAPI):
     validate_auth_secret()
     db.init()
     yield
+    ai_client.close()
+    db.close()
 
 app = FastAPI(title="WorldSphere Conservation Insights API", version="1.0.0",
               lifespan=lifespan)

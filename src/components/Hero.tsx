@@ -107,7 +107,7 @@ const Hero = () => {
 
           <motion.p className="hero__lede" variants={item}>
             Discover knowledge. Connect humanity. A living atlas of Earth's
-            animals, plants, and waters â€” told with the care of a field expedition.
+            animals, plants, and waters — told with the care of a field expedition.
           </motion.p>
 
           <motion.div className="hero__actions" variants={item}>

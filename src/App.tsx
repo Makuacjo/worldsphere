@@ -10,7 +10,7 @@ import { AuthProvider } from './context/AuthContext';
 
 import './index.css'
 
-// Route-level code splitting â€” each page ships in its own chunk, so heavy
+// Route-level code splitting — each page ships in its own chunk, so heavy
 // deps (recharts on Dashboard/RiskPredictor, ogl on Home) stay out of the
 // initial load.
 const Home = lazy(() => import('./pages/Home'));
@@ -80,7 +80,7 @@ const RouteScrollManager = () => {
   return null;
 };
 // Shared shell: persistent Navbar/Footer with the routed page in between.
-// A data router (createBrowserRouter) is required for View Transitions â€”
+// A data router (createBrowserRouter) is required for View Transitions —
 // Link viewTransition / useViewTransitionState only work under it.
 const Layout = () => (
   <>

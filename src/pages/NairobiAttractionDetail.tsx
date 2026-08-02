@@ -91,7 +91,7 @@ const NairobiAttractionDetail = () => {
         <div className="attraction-hero__content">
           <Link to="/destinations/nairobi#attractions"><ArrowLeft size={17} /> Back to Nairobi</Link>
           <div>
-            <p><MapPin size={16} /> Nairobi, Kenya Ã‚Â· {attraction.category}</p>
+            <p><MapPin size={16} /> Nairobi, Kenya · {attraction.category}</p>
             <h1>{attraction.name}</h1>
             <span className="attraction-hero__rating"><Star size={16} fill="currentColor" /> {attraction.rating}</span>
             <p className="attraction-hero__intro">{attraction.shortDescription}</p>
@@ -148,7 +148,7 @@ const NairobiAttractionDetail = () => {
       {lightboxIndex !== null && gallery[lightboxIndex] && <div className="attraction-lightbox" role="dialog" aria-modal="true" aria-label={`${attraction.name} gallery`}>
         <button className="attraction-lightbox__close" onClick={() => setLightboxIndex(null)} aria-label="Close gallery"><X size={24} /></button>
         <button className="attraction-lightbox__previous" onClick={() => setLightboxIndex((lightboxIndex - 1 + gallery.length) % gallery.length)} aria-label="Previous image"><ChevronLeft size={30} /></button>
-        <figure><img src={gallery[lightboxIndex]} alt={`${imageCaption(gallery[lightboxIndex])} at ${attraction.name}`} /><figcaption>{imageCaption(gallery[lightboxIndex])} Ã‚Â· {lightboxIndex + 1} of {gallery.length}</figcaption></figure>
+        <figure><img src={gallery[lightboxIndex]} alt={`${imageCaption(gallery[lightboxIndex])} at ${attraction.name}`} /><figcaption>{imageCaption(gallery[lightboxIndex])} · {lightboxIndex + 1} of {gallery.length}</figcaption></figure>
         <button className="attraction-lightbox__next" onClick={() => setLightboxIndex((lightboxIndex + 1) % gallery.length)} aria-label="Next image"><ChevronRight size={30} /></button>
       </div>}
 

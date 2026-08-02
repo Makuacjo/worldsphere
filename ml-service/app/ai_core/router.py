@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import logging
+import time
 from collections.abc import Iterator
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
@@ -97,6 +98,7 @@ def chat(
     user: dict | None = Depends(optional_user),
     session_id: str = Depends(session_value),
 ) -> StreamingResponse:
+    request_started = time.perf_counter()
     if not client.available():
         raise HTTPException(
             status_code=503,
@@ -112,27 +114,45 @@ def chat(
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     except rate_limit.RateLimitError as exc:
         raise HTTPException(status_code=429, detail=str(exc)) from exc
+    validation_done = time.perf_counter()
 
     user_id = user["id"] if user else None
     conversation_id = payload.conversationId
     try:
-        if conversation_id:
-            store.require_conversation(
-                conversation_id, payload.assistantType, user_id, session_id
+        with db.connect() as conn:
+            if conversation_id:
+                store.require_conversation(
+                    conversation_id, payload.assistantType, user_id, session_id, conn=conn
+                )
+            else:
+                first_user = next(item["content"] for item in messages if item["role"] == "user")
+                conversation_id = store.create_conversation(
+                    payload.assistantType, user_id, session_id, first_user[:72], conn=conn
+                )
+            latest = messages[-1]["content"]
+            user_message_id = store.add_message(
+                conversation_id, "user", latest, conn=conn
             )
-        else:
-            first_user = next(item["content"] for item in messages if item["role"] == "user")
-            conversation_id = store.create_conversation(
-                payload.assistantType, user_id, session_id, first_user[:72]
-            )
+            if user:
+                account.activity(
+                    user["id"],
+                    "ai_conversation_continued" if payload.conversationId else "ai_conversation_started",
+                    first_user[:72] if not payload.conversationId else latest[:72],
+                    "conversation",
+                    conversation_id,
+                    conn=conn,
+                )
     except (store.ConversationNotFound, store.AssistantMismatch) as exc:
         raise _translate_store_error(exc) from exc
-
-    latest = messages[-1]["content"]
-    user_message_id = store.add_message(conversation_id, "user", latest)
-    if user:
-        account.activity(user["id"], "ai_conversation_continued" if payload.conversationId else "ai_conversation_started", first_user[:72] if not payload.conversationId else latest[:72], "conversation", conversation_id)
+    database_done = time.perf_counter()
     input_chars = sum(len(item["content"]) for item in messages)
+    logger.info(
+        "AI request stages conversation=%s validation_ms=%d database_ms=%d input_chars=%d",
+        conversation_id,
+        round((validation_done - request_started) * 1000),
+        round((database_done - validation_done) * 1000),
+        input_chars,
+    )
 
     def generate() -> Iterator[str]:
         chunks: list[str] = []
@@ -146,21 +166,30 @@ def chat(
             chunks.append(fallback)
             yield fallback
         finally:
+            formatting_started = time.perf_counter()
             answer = "".join(chunks).strip()
             if answer:
-                assistant_message_id = store.add_message(
-                    conversation_id,
-                    "assistant",
-                    answer,
-                    {"replyTo": user_message_id, "model": client.MODEL},
-                )
-                store.record_usage(
-                    conversation_id, payload.assistantType, input_chars, len(answer)
-                )
+                with db.connect() as conn:
+                    assistant_message_id = store.add_message(
+                        conversation_id,
+                        "assistant",
+                        answer,
+                        {"replyTo": user_message_id, "model": client.MODEL},
+                        conn=conn,
+                    )
+                    store.record_usage(
+                        conversation_id,
+                        payload.assistantType,
+                        input_chars,
+                        len(answer),
+                        conn=conn,
+                    )
                 logger.info(
-                    "AI response assistant=%s conversation=%s message=%s input_chars=%s output_chars=%s",
+                    "AI response assistant=%s conversation=%s message=%s input_chars=%s output_chars=%s formatting_ms=%d total_ms=%d",
                     config.type.value, conversation_id, assistant_message_id,
                     input_chars, len(answer),
+                    round((time.perf_counter() - formatting_started) * 1000),
+                    round((time.perf_counter() - request_started) * 1000),
                 )
 
     return StreamingResponse(

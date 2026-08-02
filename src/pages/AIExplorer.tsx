@@ -1,4 +1,4 @@
-import { useRef, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
@@ -42,21 +42,32 @@ const AIExplorer = () => {
   const [streaming, setStreaming] = useState(false);
   const [error, setError] = useState('');
   const predictorRef = useRef<HTMLDivElement>(null);
+  const requestRef = useRef<AbortController | null>(null);
+  const inFlightRef = useRef(false);
+
+  useEffect(() => () => requestRef.current?.abort(), []);
 
   const ask = async (q: string) => {
     const question = q.trim();
-    if (!question || streaming) return;
+    if (!question || streaming || inFlightRef.current) return;
+    inFlightRef.current = true;
+    const controller = new AbortController();
+    requestRef.current = controller;
     setQuery(question);
     setAnswer('');
     setError('');
     setStreaming(true);
     try {
-      for await (const chunk of askStream(question)) {
+      for await (const chunk of askStream(question, controller.signal)) {
         setAnswer(prev => prev + chunk);
       }
     } catch (err) {
-      setError(err instanceof AiError ? err.message : 'Something went wrong asking the AI.');
+      if (!(err instanceof DOMException && err.name === 'AbortError')) {
+        setError(err instanceof AiError ? err.message : 'Something went wrong asking the AI.');
+      }
     } finally {
+      inFlightRef.current = false;
+      requestRef.current = null;
       setStreaming(false);
     }
   };

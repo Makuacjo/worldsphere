@@ -27,14 +27,22 @@ def create_conversation(
     user_id: int | None,
     session_id: str,
     title: str | None = None,
+    conn=None,
 ) -> str:
     conversation_id = secrets.token_urlsafe(18)
-    with db.connect() as conn:
-        conn.execute(
+
+    def write(connection):
+        connection.execute(
             "INSERT INTO ai_conversations "
             "(id, user_id, session_id, assistant_type, title) VALUES (%s, %s, %s, %s, %s)",
             (conversation_id, user_id, session_id, assistant_type.value, title),
         )
+
+    if conn is not None:
+        write(conn)
+    else:
+        with db.connect() as connection:
+            write(connection)
     return conversation_id
 
 
@@ -43,13 +51,21 @@ def require_conversation(
     assistant_type: AssistantType,
     user_id: int | None,
     session_id: str,
+    conn=None,
 ):
     owner_sql, owner_args = _owner_clause(user_id, session_id)
-    with db.connect() as conn:
-        row = conn.execute(
+
+    def read(connection):
+        return connection.execute(
             f"SELECT * FROM ai_conversations WHERE id = %s AND {owner_sql}",
             (conversation_id, *owner_args),
         ).fetchone()
+
+    if conn is not None:
+        row = read(conn)
+    else:
+        with db.connect() as connection:
+            row = read(connection)
     if not row:
         raise ConversationNotFound("Conversation not found.")
     if row["assistant_type"] != assistant_type.value:
@@ -62,18 +78,26 @@ def add_message(
     role: str,
     content: str,
     metadata: dict | None = None,
+    conn=None,
 ) -> str:
     message_id = secrets.token_urlsafe(15)
-    with db.connect() as conn:
-        conn.execute(
+
+    def write(connection):
+        connection.execute(
             "INSERT INTO ai_messages (id, conversation_id, role, content, metadata) "
             "VALUES (%s, %s, %s, %s, %s)",
             (message_id, conversation_id, role, content, json.dumps(metadata or {})),
         )
-        conn.execute(
+        connection.execute(
             "UPDATE ai_conversations SET updated_at = CURRENT_TIMESTAMP WHERE id = %s",
             (conversation_id,),
         )
+
+    if conn is not None:
+        write(conn)
+    else:
+        with db.connect() as connection:
+            write(connection)
     return message_id
 
 
@@ -81,6 +105,9 @@ def list_conversations(
     assistant_type: AssistantType,
     user_id: int | None,
     session_id: str,
+    search: str = "",
+    limit: int = 50,
+    offset: int = 0,
 ) -> list[dict]:
     owner_sql, owner_args = _owner_clause(user_id, session_id)
     with db.connect() as conn:
@@ -159,17 +186,26 @@ def record_usage(
     assistant_type: AssistantType,
     input_chars: int,
     output_chars: int,
+    conn=None,
 ) -> None:
-    with db.connect() as conn:
-        conn.execute(
+    values = (
+        conversation_id, assistant_type.value, input_chars, output_chars,
+        max(1, input_chars // 4), max(1, output_chars // 4),
+    )
+
+    def write(connection):
+        connection.execute(
             "INSERT INTO ai_usage (conversation_id, assistant_type, input_chars, "
             "output_chars, estimated_input_tokens, estimated_output_tokens) "
             "VALUES (%s, %s, %s, %s, %s, %s)",
-            (
-                conversation_id, assistant_type.value, input_chars, output_chars,
-                max(1, input_chars // 4), max(1, output_chars // 4),
-            ),
+            values,
         )
+
+    if conn is not None:
+        write(conn)
+    else:
+        with db.connect() as connection:
+            write(connection)
 
 
 def record_feedback(

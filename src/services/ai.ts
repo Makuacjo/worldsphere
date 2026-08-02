@@ -8,15 +8,17 @@ export class AiError extends Error {}
  * Streams the answer token-by-token. Yields text chunks as they arrive.
  * Throws AiError with the server's detail (e.g. "AI is not configured").
  */
-export async function* askStream(question: string): AsyncGenerator<string> {
+export async function* askStream(question: string, signal?: AbortSignal): AsyncGenerator<string> {
   let res: Response;
   try {
     res = await fetch(`${API_BASE}/ai/ask`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ question }),
+      signal,
     });
-  } catch {
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') throw error;
     throw new AiError(`Could not reach the AI service at ${API_BASE}. Is ml-service running?`);
   }
 

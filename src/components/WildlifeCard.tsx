@@ -32,15 +32,15 @@ const getSubtitle = (entry: WildlifeEntry): string => {
 const WildlifeCard = ({ entry }: Props) => {
   const ref = useRef<HTMLDivElement>(null);
   const to = `/species/${entry.id}`;
-  // True only while navigating to THIS card's detail page â€” so the shared
+  // True only while navigating to THIS card's detail page — so the shared
   // view-transition-name is present on exactly one image at a time.
   const isTransitioning = useViewTransitionState(to);
   const image = getOptimizedImage(entry.image, 'card');
   const summary = entry.summary.length > SUMMARY_LIMIT
-    ? entry.summary.slice(0, SUMMARY_LIMIT).trimEnd() + 'â€¦'
+    ? entry.summary.slice(0, SUMMARY_LIMIT).trimEnd() + '…'
     : entry.summary;
 
-  // Pointer-driven tilt â€” small, spring-damped. Disabled under reduced-motion
+  // Pointer-driven tilt — small, spring-damped. Disabled under reduced-motion
   // globally by <MotionConfig reducedMotion="user">.
   const px = useMotionValue(0.5);
   const py = useMotionValue(0.5);
@@ -79,7 +79,7 @@ const WildlifeCard = ({ entry }: Props) => {
         <p className="wcard__subtitle">{getSubtitle(entry)}</p>
         <p className="wcard__summary">{summary}</p>
         <Link to={to} viewTransition className="wcard__link">
-          Learn more <span aria-hidden="true">â†’</span>
+          Learn more <span aria-hidden="true">→</span>
         </Link>
       </div>
     </motion.div>
